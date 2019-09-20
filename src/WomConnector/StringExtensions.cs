@@ -38,7 +38,7 @@ namespace WomPlatform.Connector {
         }
 
         public static bool LengthIsBetween(this string s, int min, int max) {
-            if (s == null)
+            if (s is null)
                 return false;
 
             return s.Length >= min && s.Length <= max;

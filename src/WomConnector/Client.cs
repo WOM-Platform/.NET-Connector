@@ -11,7 +11,7 @@ namespace WomPlatform.Connector {
     public class Client {
 
         private T LoadFromPem<T>(Stream input) where T : class {
-            if(input == null) {
+            if(input is null) {
                 throw new ArgumentException(nameof(input));
             }
             if(!input.CanRead) {
@@ -40,7 +40,7 @@ namespace WomPlatform.Connector {
         private RestClient _client = null;
         internal protected RestClient RestClient {
             get {
-                if(_client == null) {
+                if(_client is null) {
                     _client = new RestClient(string.Format("http://{0}wom.social/api/v1",
                         TestMode ? "dev." : string.Empty
                     ));
@@ -50,7 +50,7 @@ namespace WomPlatform.Connector {
         }
 
         public Instrument CreateInstrument(long id, AsymmetricKeyParameter instrumentPrivateKey) {
-            if(instrumentPrivateKey == null) {
+            if(instrumentPrivateKey is null) {
                 throw new ArgumentNullException(nameof(instrumentPrivateKey));
             }
             if(!instrumentPrivateKey.IsPrivate) {
