@@ -4,6 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>WomPlatform.Connector</AssemblyName>
     <RootNamespace>WomPlatform.Connector</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1</Version>
+    <Authors>WOM Platform</Authors>
+    <Company>WOM Platform</Company>
+    <Product />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/WOM-Platform/.NET-Connector.git</RepositoryUrl>
+    <PackageProjectUrl>https://wom.social</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
