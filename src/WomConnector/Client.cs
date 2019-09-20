@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using RestSharp;
@@ -18,22 +19,35 @@ namespace WomPlatform.Connector {
                 throw new ArgumentException(nameof(input));
             }
 
-            using(var sr = new StreamReader(input)) {
-                var reader = new PemReader(sr);
-                return reader.ReadObject() as T;
-            }
+            // Do not dispose reader in order not to dispose input stream (handled externally)
+            var sr = new StreamReader(input);
+            var reader = new PemReader(sr);
+            return reader.ReadObject() as T;
         }
 
-        public Client(AsymmetricKeyParameter registryKey) {
+        private Client(ILoggerFactory loggerFactory) {
+            Logger = loggerFactory.CreateLogger<Client>();
+            Crypto = new CryptoProvider(loggerFactory);
+        }
+
+        public Client(ILoggerFactory loggerFactory, AsymmetricKeyParameter registryKey)
+            : this(loggerFactory) {
+
             RegistryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
         }
 
-        public Client(Stream registryKeyStream) {
+        public Client(ILoggerFactory loggerFactory, Stream registryKeyStream)
+            : this(loggerFactory) {
+
             var key = LoadFromPem<AsymmetricKeyParameter>(registryKeyStream);
             RegistryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
         }
 
         public AsymmetricKeyParameter RegistryPublicKey { get; private set; }
+
+        internal protected ILogger<Client> Logger { get; }
+
+        public CryptoProvider Crypto { get; private set; }
 
         public bool TestMode { get; set; } = false;
 
@@ -41,6 +55,8 @@ namespace WomPlatform.Connector {
         internal protected RestClient RestClient {
             get {
                 if(_client is null) {
+                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client in {0} mode", TestMode ? "test" : "production");
+
                     _client = new RestClient(string.Format("http://{0}wom.social/api/v1",
                         TestMode ? "dev." : string.Empty
                     ));
@@ -62,6 +78,14 @@ namespace WomPlatform.Connector {
 
         public Instrument CreateInstrument(long id, Stream instrumentPrivateKeyStream) {
             var pair = LoadFromPem<AsymmetricCipherKeyPair>(instrumentPrivateKeyStream);
+            if(pair is null) {
+                throw new ArgumentException("Invalid key stream", nameof(instrumentPrivateKeyStream));
+            }
+            if(pair.Private is null) {
+                throw new ArgumentException("No private key", nameof(instrumentPrivateKeyStream));
+            }
+
+            return new Instrument(this, id, pair.Private);
         }
 
     }

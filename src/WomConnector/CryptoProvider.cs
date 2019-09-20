@@ -52,7 +52,8 @@ namespace WomPlatform.Connector {
                 cryptoBlock.CopyTo(output, i * outBlockSize);
                 outputLength += cryptoBlock.Length;
 
-                Logger.LogTrace("Decrypt {0}th block (offset {1} length {2}) to {3} bytes (offset {4})",
+                Logger.LogTrace(LoggingEvents.Cryptography,
+                    "Decrypt {0}th block (offset {1} length {2}) to {3} bytes (offset {4})",
                     i + 1, offset, blockLength, cryptoBlock.Length, i * outBlockSize);
             }
 
@@ -63,7 +64,8 @@ namespace WomPlatform.Connector {
                 output = tmp;
             }
 
-            Logger.LogTrace("Decrypted {0} bytes into {1} blocks of {3} bytes, output {4} bytes",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Decrypted {0} bytes into {1} blocks of {3} bytes, output {4} bytes",
                 payload.Length, blocks, outBlockSize, output.Length);
 
             return output;
@@ -88,7 +90,8 @@ namespace WomPlatform.Connector {
                 cryptoBlock.CopyTo(output, i * outBlockSize);
                 outputLength += cryptoBlock.Length;
 
-                Logger.LogTrace("Encrypt {0}th block (offset {1} length {2}) to {3} bytes (offset {4})",
+                Logger.LogTrace(LoggingEvents.Cryptography,
+                    "Encrypt {0}th block (offset {1} length {2}) to {3} bytes (offset {4})",
                     i + 1, offset, blockLength, cryptoBlock.Length, i * outBlockSize);
             }
 
@@ -99,7 +102,8 @@ namespace WomPlatform.Connector {
                 output = tmp;
             }
 
-            Logger.LogTrace("Encrypted {0} bytes into {1} blocks of {2} bytes, output {3} bytes",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Encrypted {0} bytes into {1} blocks of {2} bytes, output {3} bytes",
                 payload.Length, blocks, outBlockSize, output.Length);
 
             return output;
@@ -123,7 +127,8 @@ namespace WomPlatform.Connector {
             var decryptBytes = Decrypt(payloadBytes, receiverPrivateKey);
             var verifyBytes = Decrypt(decryptBytes, senderPublicKey);
 
-            Logger.LogTrace("Decrypt and verify {3} chars (bytes {0} => {1} => {2})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Decrypt and verify {3} chars (bytes {0} => {1} => {2})",
                 payloadBytes.Length, decryptBytes.Length, verifyBytes.Length, payload.Length);
 
             return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), JsonSettings);
@@ -147,7 +152,8 @@ namespace WomPlatform.Connector {
             var signedBytes = Encrypt(payloadBytes, senderPrivateKey);
             var encryptedBytes = Encrypt(signedBytes, receiverPublicKey);
 
-            Logger.LogTrace("Sign and encrypt object (bytes {0} => {1} => {2})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Sign and encrypt object (bytes {0} => {1} => {2})",
                 payloadBytes.Length, signedBytes.Length, encryptedBytes.Length);
 
             return encryptedBytes.ToBase64();
@@ -166,7 +172,8 @@ namespace WomPlatform.Connector {
             var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
             var signedBytes = Encrypt(payloadBytes, senderPrivateKey);
 
-            Logger.LogTrace("Sign object (bytes {0} => {1})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Sign object (bytes {0} => {1})",
                 payloadBytes.Length, signedBytes.Length);
 
             return signedBytes.ToBase64();
@@ -185,7 +192,8 @@ namespace WomPlatform.Connector {
             var payloadBytes = payload.FromBase64();
             var verifyBytes = Decrypt(payloadBytes, senderPublicKey);
 
-            Logger.LogTrace("Verify {2} chars (bytes {0} => {1})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Verify {2} chars (bytes {0} => {1})",
                 payloadBytes.Length, verifyBytes.Length, payload.Length);
 
             return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), JsonSettings);
@@ -204,7 +212,8 @@ namespace WomPlatform.Connector {
             var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
             var signedBytes = Encrypt(payloadBytes, receiverPublicKey);
 
-            Logger.LogTrace("Encrypt object (bytes {0} => {1})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Encrypt object (bytes {0} => {1})",
                 payloadBytes.Length, signedBytes.Length);
 
             return signedBytes.ToBase64();
@@ -223,7 +232,8 @@ namespace WomPlatform.Connector {
             var payloadBytes = payload.FromBase64();
             var decryptedBytes = Decrypt(payloadBytes, receiverPrivateKey);
 
-            Logger.LogTrace("Decrypt {2} chars (bytes {0} => {1})",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Decrypt {2} chars (bytes {0} => {1})",
                 payloadBytes.Length, decryptedBytes.Length, payload.Length);
 
             return JsonConvert.DeserializeObject<T>(decryptedBytes.AsUtf8String(), JsonSettings);
@@ -233,10 +243,10 @@ namespace WomPlatform.Connector {
         private const int AesMinKeySize = 256 / 8;
 
         private IBufferedCipher CreateAesCipher(bool encrypt, byte[] initialVector, byte[] key) {
-            if (key == null || key.Length != AesMinKeySize) {
+            if (key is null || key.Length != AesMinKeySize) {
                 throw new ArgumentException(string.Format("AES key is not {0} bytes long", AesMinKeySize));
             }
-            if (initialVector == null || initialVector.Length != AesBlockSize) {
+            if (initialVector is null || initialVector.Length != AesBlockSize) {
                 throw new ArgumentException(string.Format("AES initial vector is not {0} bytes long", AesBlockSize));
             }
 
@@ -263,7 +273,8 @@ namespace WomPlatform.Connector {
             byte[] output = new byte[outputSize + AesBlockSize];
             Array.Copy(iv, output, iv.Length);
 
-            Logger.LogTrace(LoggingEvents.Crypto, "Encrypting {0} bytes to {1} bytes with {2}",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Encrypting {0} bytes to {1} bytes with {2}",
                 payloadBytes.Length, outputSize, cipher.AlgorithmName);
 
             int outputLength = cipher.ProcessBytes(payloadBytes, output, AesBlockSize);
@@ -286,7 +297,8 @@ namespace WomPlatform.Connector {
             int outputSize = cipher.GetOutputSize(payloadBytes.Length);
             byte[] output = new byte[outputSize];
 
-            Logger.LogTrace(LoggingEvents.Crypto, "Decrypting {0} bytes to {1} bytes with {2}",
+            Logger.LogTrace(LoggingEvents.Cryptography,
+                "Decrypting {0} bytes to {1} bytes with {2}",
                 payloadBytes.Length, outputSize, cipher.AlgorithmName);
 
             int outputLength = cipher.ProcessBytes(payloadBytes, AesBlockSize, payloadBytes.Length - AesBlockSize, output, 0);

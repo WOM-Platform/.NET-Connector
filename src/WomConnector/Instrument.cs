@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Org.BouncyCastle.Crypto;
-using RestSharp;
+using WomPlatform.Connector.Models;
+using Microsoft.Extensions.Logging;
 
 namespace WomPlatform.Connector {
 
@@ -21,7 +21,49 @@ namespace WomPlatform.Connector {
             }
         }
 
+        public async Task<(Guid Otc, string Password)> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers, string nonce = null, string password = null) {
+            if(vouchers is null || vouchers.Length == 0) {
+                throw new ArgumentNullException(nameof(vouchers));
+            }
 
+            _client.Logger.LogInformation(LoggingEvents.Instrument,
+                "Requesting vouchers with {0} specification templates", vouchers.Length);
+
+            var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
+
+            var request = _client.RestClient.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
+                SourceId = _id,
+                Nonce = effectiveNonce,
+                Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
+                    SourceId = 1,
+                    Nonce = effectiveNonce,
+                    Password = password,
+                    Vouchers = vouchers
+                }, _client.RegistryPublicKey)
+            });
+
+            _client.Logger.LogDebug(LoggingEvents.Instrument,
+                "Performing voucher creation request");
+
+            var response = await _client.RestClient.PerformRequest<VoucherCreateResponse>(request);
+            var responseContent = _client.Crypto.Decrypt<VoucherCreateResponse.Content>(response.Payload, _privateKey);
+
+            request = _client.RestClient.CreateJsonPostRequest("voucher/verify", new VoucherVerifyPayload {
+                Payload = _client.Crypto.Encrypt(new VoucherVerifyPayload.Content {
+                    Otc = responseContent.Otc
+                }, _client.RegistryPublicKey)
+            });
+
+            _client.Logger.LogDebug(LoggingEvents.Instrument,
+                "Performing voucher verification request");
+
+            await _client.RestClient.PerformRequest<VoucherCreateResponse>(request);
+
+            _client.Logger.LogDebug(LoggingEvents.Instrument,
+                "Voucher creation succeeded");
+
+            return (responseContent.Otc, responseContent.Password);
+        }
 
     }
 
