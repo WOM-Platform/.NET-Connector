@@ -35,7 +35,7 @@ namespace WomPlatform.Connector {
                 SourceId = _id,
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
-                    SourceId = 1,
+                    SourceId = _id,
                     Nonce = effectiveNonce,
                     Password = password,
                     Vouchers = vouchers
