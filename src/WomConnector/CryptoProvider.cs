@@ -307,6 +307,17 @@ namespace WomPlatform.Connector {
             return JsonConvert.DeserializeObject<T>(output.AsUtf8String(), JsonSettings);
         }
 
+        public const int SessionKeyLength = 256 / 8; // 256 bit
+
+        /// <summary>
+        /// Generate a new random session key of <see cref="SessionKeyLength"/> length.
+        /// </summary>
+        public byte[] GenerateSessionKey() {
+            byte[] sessionKey = new byte[SessionKeyLength];
+            Generator.NextBytes(sessionKey);
+            return sessionKey;
+        }
+
     }
 
 }

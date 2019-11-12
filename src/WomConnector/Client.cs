@@ -49,6 +49,9 @@ namespace WomPlatform.Connector {
 
         public CryptoProvider Crypto { get; private set; }
 
+        /// <summary>
+        /// Gets or sets whether to use a development or production instance of the Registry.
+        /// </summary>
         public bool TestMode { get; set; } = false;
 
         private RestClient _client = null;
@@ -65,6 +68,11 @@ namespace WomPlatform.Connector {
             }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Instrument"/> instance.
+        /// </summary>
+        /// <param name="id">Unique ID of the instrument.</param>
+        /// <param name="instrumentPrivateKeyStream">Private key instance.</param>
         public Instrument CreateInstrument(long id, AsymmetricKeyParameter instrumentPrivateKey) {
             if(instrumentPrivateKey is null) {
                 throw new ArgumentNullException(nameof(instrumentPrivateKey));
@@ -76,6 +84,11 @@ namespace WomPlatform.Connector {
             return new Instrument(this, id, instrumentPrivateKey);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Instrument"/> instance.
+        /// </summary>
+        /// <param name="id">Unique ID of the instrument.</param>
+        /// <param name="instrumentPrivateKeyStream">Stream of the instrument's private key.</param>
         public Instrument CreateInstrument(long id, Stream instrumentPrivateKeyStream) {
             var pair = LoadFromPem<AsymmetricCipherKeyPair>(instrumentPrivateKeyStream);
             if(pair is null) {
@@ -86,6 +99,13 @@ namespace WomPlatform.Connector {
             }
 
             return new Instrument(this, id, pair.Private);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Pocket"/> instance.
+        /// </summary>
+        public Pocket CreatePocket() {
+            return new Pocket(this);
         }
 
     }

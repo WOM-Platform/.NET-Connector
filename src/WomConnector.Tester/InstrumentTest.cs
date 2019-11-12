@@ -10,8 +10,7 @@ namespace WomConnector.Tester {
 
     public class InstrumentTest {
 
-        [Test]
-        public async Task CreateSimpleVoucher() {
+        public static async Task<(Guid otc, string password)> GenerateVoucherRequestSource1(int count) {
             var instrument = Util.CreateInstrument(1, "keys/source1.pem");
 
             var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
@@ -23,6 +22,13 @@ namespace WomConnector.Tester {
                     Timestamp = DateTime.UtcNow
                 }
             });
+
+            return (otc, password);
+        }
+
+        [Test]
+        public async Task CreateSimpleVoucher() {
+            var (otc, password) = await GenerateVoucherRequestSource1(1);
 
             Console.WriteLine("Voucher {0} pwd {1}", otc, password);
         }

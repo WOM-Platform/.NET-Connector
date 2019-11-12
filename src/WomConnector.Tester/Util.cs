@@ -29,7 +29,7 @@ namespace WomConnector.Tester {
         private class LoggerFactory : ILoggerFactory {
 
             public void AddProvider(ILoggerProvider provider) {
-                
+
             }
 
             public ILogger CreateLogger(string categoryName) {
@@ -37,7 +37,7 @@ namespace WomConnector.Tester {
             }
 
             public void Dispose() {
-                
+
             }
 
         }
@@ -53,15 +53,28 @@ namespace WomConnector.Tester {
             };
         }
 
-        public static Instrument CreateInstrument(long sourceId, string sourceKeyPath) {
-            var client = Util.CreateClient();
+        private static Client _client = null;
 
+        public static Client Client {
+            get {
+                if(_client == null) {
+                    _client = CreateClient();
+                }
+                return _client;
+            }
+        }
+
+        public static Instrument CreateInstrument(long sourceId, string sourceKeyPath) {
             AsymmetricCipherKeyPair keys = null;
             using(var fs = new FileStream(sourceKeyPath, FileMode.Open)) {
                 keys = KeyUtil.LoadCipherKeyPairFromPem(fs);
             }
 
-            return client.CreateInstrument(sourceId, keys.Private);
+            return Client.CreateInstrument(sourceId, keys.Private);
+        }
+
+        public static Pocket CreatePocket() {
+            return Client.CreatePocket();
         }
 
     }
