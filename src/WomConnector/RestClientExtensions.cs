@@ -33,6 +33,17 @@ namespace WomPlatform.Connector {
             return JsonConvert.DeserializeObject<T>(response.Content);
         }
 
+        public static async Task PerformRequest(this RestClient client, RestRequest request) {
+            if(client is null) {
+                throw new ArgumentNullException(nameof(client));
+            }
+
+            var response = await client.ExecutePostTaskAsync(request).ConfigureAwait(false);
+            if(response.StatusCode != System.Net.HttpStatusCode.OK) {
+                throw new InvalidOperationException(string.Format("API status code {0}", response.StatusCode));
+            }
+        }
+
     }
 
 }

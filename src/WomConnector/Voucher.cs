@@ -7,37 +7,46 @@ namespace WomPlatform.Connector {
     /// <summary>
     /// In-memory representation of a voucher.
     /// </summary>
-    public class Voucher {
+    public sealed class Voucher {
+
+        public Voucher(long id, string secret, string aim, double lat, double lng, DateTime timestamp) {
+            Id = id;
+            Secret = secret;
+            Aim = aim;
+            Latitude = lat;
+            Longitude = lng;
+            Timestamp = timestamp;
+        }
 
         /// <summary>
         /// Unique voucher ID.
         /// </summary>
-        public long Id { get; set; }
+        public long Id { get; private set; }
 
         /// <summary>
         /// Voucher secret for usage.
         /// </summary>
-        public string Secret { get; set; }
+        public string Secret { get; private set; }
 
         /// <summary>
         /// Simple Aim code.
         /// </summary>
-        public string Aim { get; set; }
+        public string Aim { get; private set; }
 
         /// <summary>
         /// Voucher generation latitude.
         /// </summary>
-        public double Latitude { get; set; }
+        public double Latitude { get; private set; }
 
         /// <summary>
         /// Voucher generation longitude.
         /// </summary>
-        public double Longitude { get; set; }
+        public double Longitude { get; private set; }
 
         /// <summary>
         /// Voucher generation timestamp.
         /// </summary>
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; private set; }
 
     }
 

@@ -8,7 +8,7 @@ namespace WomPlatform.Connector {
 
         public const int Client = 2000;
         public const int Instrument = 2001;
-        public const int PointOfService = 2002;
+        public const int PointOfSale = 2002;
         public const int Pocket = 2003;
         public const int Cryptography = 2010;
 

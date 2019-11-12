@@ -21,7 +21,9 @@ namespace WomPlatform.Connector {
             }
         }
 
-        public async Task<(Guid Otc, string Password)> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers, string nonce = null, string password = null) {
+        public async Task<(Guid Otc, string Password)> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers,
+            string nonce = null, string password = null) {
+
             if(vouchers is null || vouchers.Length == 0) {
                 throw new ArgumentNullException(nameof(vouchers));
             }
@@ -57,7 +59,7 @@ namespace WomPlatform.Connector {
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing voucher verification request");
 
-            await _client.RestClient.PerformRequest<VoucherCreateResponse>(request);
+            await _client.RestClient.PerformRequest(request);
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");

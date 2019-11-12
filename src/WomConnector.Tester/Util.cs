@@ -77,6 +77,15 @@ namespace WomConnector.Tester {
             return Client.CreatePocket();
         }
 
+        public static PointOfSale CreatePos(long posId, string posKeyPath) {
+            AsymmetricCipherKeyPair keys = null;
+            using(var fs = new FileStream(posKeyPath, FileMode.Open)) {
+                keys = KeyUtil.LoadCipherKeyPairFromPem(fs);
+            }
+
+            return Client.CreatePos(posId, keys.Private);
+        }
+
     }
 
 }

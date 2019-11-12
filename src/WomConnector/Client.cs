@@ -72,7 +72,7 @@ namespace WomPlatform.Connector {
         /// Creates a new <see cref="Instrument"/> instance.
         /// </summary>
         /// <param name="id">Unique ID of the instrument.</param>
-        /// <param name="instrumentPrivateKeyStream">Private key instance.</param>
+        /// <param name="instrumentPrivateKey">Private key instance.</param>
         public Instrument CreateInstrument(long id, AsymmetricKeyParameter instrumentPrivateKey) {
             if(instrumentPrivateKey is null) {
                 throw new ArgumentNullException(nameof(instrumentPrivateKey));
@@ -106,6 +106,39 @@ namespace WomPlatform.Connector {
         /// </summary>
         public Pocket CreatePocket() {
             return new Pocket(this);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="PointOfSale"/> instance.
+        /// </summary>
+        /// <param name="id">Unique ID of the POS.</param>
+        /// <param name="instrumentPrivateKey">Private key instance.</param>
+        public PointOfSale CreatePos(long id, AsymmetricKeyParameter instrumentPrivateKey) {
+            if(instrumentPrivateKey is null) {
+                throw new ArgumentNullException(nameof(instrumentPrivateKey));
+            }
+            if(!instrumentPrivateKey.IsPrivate) {
+                throw new ArgumentException("Key must be private", nameof(instrumentPrivateKey));
+            }
+
+            return new PointOfSale(this, id, instrumentPrivateKey);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="PointOfSale"/> instance.
+        /// </summary>
+        /// <param name="id">Unique ID of the POS.</param>
+        /// <param name="instrumentPrivateKeyStream">Stream of the POS private key.</param>
+        public PointOfSale CreatePos(long id, Stream posPrivateyKeyStream) {
+            var pair = LoadFromPem<AsymmetricCipherKeyPair>(posPrivateyKeyStream);
+            if(pair is null) {
+                throw new ArgumentException("Invalid key stream", nameof(posPrivateyKeyStream));
+            }
+            if(pair.Private is null) {
+                throw new ArgumentException("No private key", nameof(posPrivateyKeyStream));
+            }
+
+            return new PointOfSale(this, id, pair.Private);
         }
 
     }
