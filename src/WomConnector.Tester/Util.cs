@@ -53,6 +53,17 @@ namespace WomConnector.Tester {
             };
         }
 
+        public static Instrument CreateInstrument(long sourceId, string sourceKeyPath) {
+            var client = Util.CreateClient();
+
+            AsymmetricCipherKeyPair keys = null;
+            using(var fs = new FileStream(sourceKeyPath, FileMode.Open)) {
+                keys = KeyUtil.LoadCipherKeyPairFromPem(fs);
+            }
+
+            return client.CreateInstrument(sourceId, keys.Private);
+        }
+
     }
 
 }
