@@ -29,7 +29,7 @@ namespace WomPlatform.Connector.Models {
 
         public class VoucherInfo {
 
-            public long Id { get; set; }
+            public VoucherId Id { get; set; }
 
             public string Secret { get; set; }
 

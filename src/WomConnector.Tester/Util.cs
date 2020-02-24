@@ -48,9 +48,7 @@ namespace WomConnector.Tester {
                 pubKey = KeyUtil.LoadKeyParameterFromPem(fs);
             }
 
-            return new Client(new LoggerFactory(), pubKey) {
-                TestMode = true
-            };
+            return new Client("dev.wom.social", new LoggerFactory(), pubKey);
         }
 
         private static Client _client = null;

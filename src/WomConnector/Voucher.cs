@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using WomPlatform.Connector.Models;
 
 namespace WomPlatform.Connector {
 
@@ -9,7 +10,7 @@ namespace WomPlatform.Connector {
     /// </summary>
     public sealed class Voucher {
 
-        public Voucher(long id, string secret, string aim, double lat, double lng, DateTime timestamp) {
+        public Voucher(VoucherId id, string secret, string aim, double lat, double lng, DateTime timestamp) {
             Id = id;
             Secret = secret;
             Aim = aim;
@@ -21,7 +22,7 @@ namespace WomPlatform.Connector {
         /// <summary>
         /// Unique voucher ID.
         /// </summary>
-        public long Id { get; private set; }
+        public VoucherId Id { get; private set; }
 
         /// <summary>
         /// Voucher secret for usage.

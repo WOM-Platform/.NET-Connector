@@ -39,7 +39,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Unique voucher ID.
             /// </summary>
-            public long Id { get; set; }
+            public VoucherId Id { get; set; }
 
             /// <summary>
             /// Voucher secret for usage.

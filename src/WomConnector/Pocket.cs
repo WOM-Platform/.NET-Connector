@@ -71,6 +71,9 @@ namespace WomPlatform.Connector {
 
             foreach(var v in responseContent.Vouchers) {
                 _vouchers.Add(new Voucher(v.Id, v.Secret, v.Aim, v.Latitude, v.Longitude, v.Timestamp));
+                _client.Logger.LogTrace(LoggingEvents.Pocket,
+                    "Collected voucher #{0} for aim {1}",
+                    v.Id.ToString(), v.Aim);
             }
         }
 

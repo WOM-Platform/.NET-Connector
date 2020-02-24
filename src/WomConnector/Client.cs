@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Text;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using RestSharp;
@@ -10,6 +10,23 @@ using RestSharp;
 namespace WomPlatform.Connector {
 
     public class Client {
+
+        /// <summary>
+        /// Common JSON serializer to be used internally.
+        /// </summary>
+        internal static JsonSerializerSettings JsonSettings { get; private set; }
+
+        static Client() {
+            JsonSettings = new JsonSerializerSettings {
+                Culture = CultureInfo.InvariantCulture,
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                DateParseHandling = DateParseHandling.DateTime,
+                Formatting = Formatting.None,
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            JsonSettings.Converters.Add(new VoucherIdConverter());
+        }
 
         private T LoadFromPem<T>(Stream input) where T : class {
             if(input is null) {
@@ -25,43 +42,74 @@ namespace WomPlatform.Connector {
             return reader.ReadObject() as T;
         }
 
-        private Client(ILoggerFactory loggerFactory) {
+        /// <summary>
+        /// Default public WOM domain (wom.social).
+        /// </summary>
+        public const string DefaultWomDomain = "wom.social";
+
+        private readonly string _womDomain;
+
+        private Client(string womDomain, ILoggerFactory loggerFactory) {
+            _womDomain = womDomain;
             Logger = loggerFactory.CreateLogger<Client>();
             Crypto = new CryptoProvider(loggerFactory);
         }
 
+        /// <summary>
+        /// Creates a new WOM client with a given public Registry key.
+        /// </summary>
         public Client(ILoggerFactory loggerFactory, AsymmetricKeyParameter registryKey)
-            : this(loggerFactory) {
+            : this(DefaultWomDomain, loggerFactory) {
 
             RegistryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
         }
 
+        /// <summary>
+        /// Creates a new WOM client with a stream to a public Registry key.
+        /// </summary>
         public Client(ILoggerFactory loggerFactory, Stream registryKeyStream)
-            : this(loggerFactory) {
+            : this(DefaultWomDomain, loggerFactory) {
 
             var key = LoadFromPem<AsymmetricKeyParameter>(registryKeyStream);
             RegistryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
         }
 
+        /// <summary>
+        /// Creates a new WOM client with a given public Registry key.
+        /// </summary>
+        public Client(string womDomain, ILoggerFactory loggerFactory, AsymmetricKeyParameter registryKey)
+            : this(womDomain, loggerFactory) {
+
+            RegistryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
+        }
+
+        /// <summary>
+        /// Creates a new WOM client with a stream to a public Registry key.
+        /// </summary>
+        public Client(string womDomain, ILoggerFactory loggerFactory, Stream registryKeyStream)
+            : this(womDomain, loggerFactory) {
+
+            var key = LoadFromPem<AsymmetricKeyParameter>(registryKeyStream);
+            RegistryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
+        }
+
+        /// <summary>
+        /// The Registry's public key.
+        /// </summary>
         public AsymmetricKeyParameter RegistryPublicKey { get; private set; }
 
         internal protected ILogger<Client> Logger { get; }
 
         public CryptoProvider Crypto { get; private set; }
 
-        /// <summary>
-        /// Gets or sets whether to use a development or production instance of the Registry.
-        /// </summary>
-        public bool TestMode { get; set; } = false;
-
         private RestClient _client = null;
         internal protected RestClient RestClient {
             get {
                 if(_client is null) {
-                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client in {0} mode", TestMode ? "test" : "production");
+                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client for WOM domain {0}", _womDomain);
 
-                    _client = new RestClient(string.Format("http://{0}wom.social/api/v1",
-                        TestMode ? "dev." : string.Empty
+                    _client = new RestClient(string.Format("http://{0}/api/v1",
+                        _womDomain
                     ));
                 }
                 return _client;

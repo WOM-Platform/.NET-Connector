@@ -24,15 +24,6 @@ namespace WomPlatform.Connector {
 
         protected ILogger<CryptoProvider> Logger { get; }
 
-        private readonly static JsonSerializerSettings JsonSettings = new JsonSerializerSettings {
-            Culture = CultureInfo.InvariantCulture,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            DateParseHandling = DateParseHandling.DateTime,
-            Formatting = Formatting.None,
-            NullValueHandling = NullValueHandling.Ignore
-        };
-
         /// <summary>
         /// Decrypts a byte payload using a given key.
         /// </summary>
@@ -131,7 +122,7 @@ namespace WomPlatform.Connector {
                 "Decrypt and verify {3} chars (bytes {0} => {1} => {2})",
                 payloadBytes.Length, decryptBytes.Length, verifyBytes.Length, payload.Length);
 
-            return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), JsonSettings);
+            return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), Client.JsonSettings);
         }
 
         /// <summary>
@@ -148,7 +139,7 @@ namespace WomPlatform.Connector {
                 throw new ArgumentException("Public key of receiver required for encryption", nameof(receiverPublicKey));
             }
 
-            var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
+            var payloadBytes = JsonConvert.SerializeObject(payload, Client.JsonSettings).ToBytes();
             var signedBytes = Encrypt(payloadBytes, senderPrivateKey);
             var encryptedBytes = Encrypt(signedBytes, receiverPublicKey);
 
@@ -169,7 +160,7 @@ namespace WomPlatform.Connector {
                 throw new ArgumentException("Private key of sender required for signing", nameof(senderPrivateKey));
             }
 
-            var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
+            var payloadBytes = JsonConvert.SerializeObject(payload, Client.JsonSettings).ToBytes();
             var signedBytes = Encrypt(payloadBytes, senderPrivateKey);
 
             Logger.LogTrace(LoggingEvents.Cryptography,
@@ -196,7 +187,7 @@ namespace WomPlatform.Connector {
                 "Verify {2} chars (bytes {0} => {1})",
                 payloadBytes.Length, verifyBytes.Length, payload.Length);
 
-            return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), JsonSettings);
+            return JsonConvert.DeserializeObject<T>(verifyBytes.AsUtf8String(), Client.JsonSettings);
         }
 
         /// <summary>
@@ -209,7 +200,7 @@ namespace WomPlatform.Connector {
                 throw new ArgumentException("Public key of receiver required for encryption", nameof(receiverPublicKey));
             }
 
-            var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
+            var payloadBytes = JsonConvert.SerializeObject(payload, Client.JsonSettings).ToBytes();
             var signedBytes = Encrypt(payloadBytes, receiverPublicKey);
 
             Logger.LogTrace(LoggingEvents.Cryptography,
@@ -236,7 +227,7 @@ namespace WomPlatform.Connector {
                 "Decrypt {2} chars (bytes {0} => {1})",
                 payloadBytes.Length, decryptedBytes.Length, payload.Length);
 
-            return JsonConvert.DeserializeObject<T>(decryptedBytes.AsUtf8String(), JsonSettings);
+            return JsonConvert.DeserializeObject<T>(decryptedBytes.AsUtf8String(), Client.JsonSettings);
         }
 
         private const int AesBlockSize = 128 / 8;
@@ -262,7 +253,7 @@ namespace WomPlatform.Connector {
         /// </summary>
         /// <param name="sessionKey">Temporary session key of 256 bits.</param>
         public string Encrypt<T>(T payload, byte[] sessionKey) {
-            var payloadBytes = JsonConvert.SerializeObject(payload, JsonSettings).ToBytes();
+            var payloadBytes = JsonConvert.SerializeObject(payload, Client.JsonSettings).ToBytes();
 
             byte[] iv = new byte[AesBlockSize];
             Generator.NextBytes(iv);
@@ -304,7 +295,7 @@ namespace WomPlatform.Connector {
             int outputLength = cipher.ProcessBytes(payloadBytes, AesBlockSize, payloadBytes.Length - AesBlockSize, output, 0);
             int finalLength = cipher.DoFinal(output, outputLength);
 
-            return JsonConvert.DeserializeObject<T>(output.AsUtf8String(), JsonSettings);
+            return JsonConvert.DeserializeObject<T>(output.AsUtf8String(), Client.JsonSettings);
         }
 
         public const int SessionKeyLength = 256 / 8; // 256 bit
