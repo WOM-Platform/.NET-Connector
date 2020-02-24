@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using RestSharp;
@@ -12,20 +13,34 @@ namespace WomPlatform.Connector {
     public class Client {
 
         /// <summary>
-        /// Common JSON serializer to be used internally.
+        /// Create common JSON serializer settings.
         /// </summary>
-        internal static JsonSerializerSettings JsonSettings { get; private set; }
+        public static JsonSerializerSettings JsonSettings {
+            get {
+                var ret = new JsonSerializerSettings {
+                    ContractResolver = new DefaultContractResolver {
+                        NamingStrategy = new CamelCaseNamingStrategy()
+                    },
+                    Culture = CultureInfo.InvariantCulture,
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                    DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                    DateParseHandling = DateParseHandling.DateTime,
+                    Formatting = Formatting.None,
+                    NullValueHandling = NullValueHandling.Ignore
+                };
+                ret.Converters.Add(new IdentifierConverter());
+                return ret;
+            }
+        }
 
-        static Client() {
-            JsonSettings = new JsonSerializerSettings {
-                Culture = CultureInfo.InvariantCulture,
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                DateParseHandling = DateParseHandling.DateTime,
-                Formatting = Formatting.None,
-                NullValueHandling = NullValueHandling.Ignore
-            };
-            JsonSettings.Converters.Add(new IdentifierConverter());
+        private static JsonSerializerSettings _jsonSettings = null;
+        internal static JsonSerializerSettings JsonSettingsCache {
+            get {
+                if(_jsonSettings == null) {
+                    _jsonSettings = JsonSettings;
+                }
+                return _jsonSettings;
+            }
         }
 
         private T LoadFromPem<T>(Stream input) where T : class {
