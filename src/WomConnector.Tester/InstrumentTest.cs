@@ -56,7 +56,7 @@ namespace WomConnector.Tester {
         public void FailSourceId() {
             var instrument = Util.CreateInstrument(2, "keys/source1.pem");
 
-            Assert.ThrowsAsync<InvalidOperationException>(async () => {
+            Assert.ThrowsAsync<InvalidCipherTextException>(async () => {
                 var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
