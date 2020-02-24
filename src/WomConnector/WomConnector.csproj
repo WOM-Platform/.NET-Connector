@@ -5,18 +5,19 @@
     <AssemblyName>WomPlatform.Connector</AssemblyName>
     <RootNamespace>WomPlatform.Connector</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0</Version>
+    <Version>2.0</Version>
     <Authors>WOM Platform</Authors>
     <Company>WOM Platform</Company>
     <Product />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/WOM-Platform/.NET-Connector.git</RepositoryUrl>
     <PackageProjectUrl>https://wom.social</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/WOM-Platform/.NET-Connector/master/icon/wom-logo.png</PackageIconUrl>
+    <PackageIconUrl></PackageIconUrl>
     <Description>WOM is general-purpose rewarding platform based on a voucher exchange system.
 WOM stands for “Worth One Minute”: each WOM voucher rewards one minute of socially-valuable effort performed by an individual.
 
 This connector allows .NET projects of all kinds to act as a WOM Pocket, Instrument, Point of Sale, or to implement Registry functionalities.</Description>
+    <PackageIcon>wom-logo-128.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,13 @@ This connector allows .NET projects of all kinds to act as a WOM Pocket, Instrum
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.5.2" />
     <PackageReference Include="RestSharp" Version="106.10.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon\wom-logo-128.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
