@@ -25,7 +25,7 @@ namespace WomPlatform.Connector {
                 Formatting = Formatting.None,
                 NullValueHandling = NullValueHandling.Ignore
             };
-            JsonSettings.Converters.Add(new VoucherIdConverter());
+            JsonSettings.Converters.Add(new IdentifierConverter());
         }
 
         private T LoadFromPem<T>(Stream input) where T : class {

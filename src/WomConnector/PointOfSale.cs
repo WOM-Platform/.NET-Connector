@@ -41,10 +41,10 @@ namespace WomPlatform.Connector {
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
             var request = _client.RestClient.CreateJsonPostRequest("payment/register", new PaymentRegisterPayload {
-                PosId = _id,
+                PosId = new Identifier(_id),
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new PaymentRegisterPayload.Content {
-                    PosId = _id,
+                    PosId = new Identifier(_id),
                     Nonce = effectiveNonce,
                     Password = password,
                     Amount = amount,

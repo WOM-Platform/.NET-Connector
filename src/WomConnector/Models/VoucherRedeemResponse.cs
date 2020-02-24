@@ -17,7 +17,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// ID of the source.
             /// </summary>
-            public long SourceId { get; set; }
+            public Identifier SourceId { get; set; }
 
             /// <summary>
             /// Name of the source.
@@ -39,7 +39,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Unique voucher ID.
             /// </summary>
-            public VoucherId Id { get; set; }
+            public Identifier Id { get; set; }
 
             /// <summary>
             /// Voucher secret for usage.

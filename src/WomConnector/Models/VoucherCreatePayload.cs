@@ -12,7 +12,7 @@ namespace WomPlatform.Connector.Models {
         /// <summary>
         /// Unique ID of the source.
         /// </summary>
-        public long SourceId { get; set; }
+        public Identifier SourceId { get; set; }
 
         /// <summary>
         /// Nonce to prevent repetition (base64-encoded).
@@ -32,7 +32,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Unique ID of the source.
             /// </summary>
-            public long SourceId { get; set; }
+            public Identifier SourceId { get; set; }
 
             /// <summary>
             /// Nonce to prevent repetition (base64-encoded).

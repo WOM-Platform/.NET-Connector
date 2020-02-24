@@ -10,7 +10,7 @@ namespace WomPlatform.Connector {
     /// </summary>
     public sealed class Voucher {
 
-        public Voucher(VoucherId id, string secret, string aim, double lat, double lng, DateTime timestamp) {
+        public Voucher(Identifier id, string secret, string aim, double lat, double lng, DateTime timestamp) {
             Id = id;
             Secret = secret;
             Aim = aim;
@@ -22,7 +22,7 @@ namespace WomPlatform.Connector {
         /// <summary>
         /// Unique voucher ID.
         /// </summary>
-        public VoucherId Id { get; private set; }
+        public Identifier Id { get; private set; }
 
         /// <summary>
         /// Voucher secret for usage.

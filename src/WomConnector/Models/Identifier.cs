@@ -2,15 +2,15 @@
 
 namespace WomPlatform.Connector.Models {
 
-    public struct VoucherId {
+    public struct Identifier {
 
         public string Id;
 
-        public VoucherId(string id) {
+        public Identifier(string id) {
             Id = id;
         }
 
-        public VoucherId(long id) {
+        public Identifier(long id) {
             if(id < 0) {
                 throw new ArgumentOutOfRangeException();
             }
@@ -18,7 +18,7 @@ namespace WomPlatform.Connector.Models {
             Id = id.ToString();
         }
 
-        public static implicit operator string(VoucherId vId) => vId.Id;
+        public static implicit operator string(Identifier vId) => vId.Id;
 
         public override bool Equals(object obj) {
             return Id.Equals(obj);

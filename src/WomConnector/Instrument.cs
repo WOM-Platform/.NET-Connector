@@ -34,10 +34,10 @@ namespace WomPlatform.Connector {
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
             var request = _client.RestClient.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
-                SourceId = _id,
+                SourceId = new Identifier(_id),
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
-                    SourceId = _id,
+                    SourceId = new Identifier(_id),
                     Nonce = effectiveNonce,
                     Password = password,
                     Vouchers = vouchers

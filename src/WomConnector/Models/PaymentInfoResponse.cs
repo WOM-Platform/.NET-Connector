@@ -22,7 +22,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Unique ID of the POS.
             /// </summary>
-            public long PosId { get; set; }
+            public Identifier PosId { get; set; }
 
             /// <summary>
             /// Name of the POS.

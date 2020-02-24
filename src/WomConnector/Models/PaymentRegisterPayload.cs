@@ -15,7 +15,7 @@ namespace WomPlatform.Connector.Models {
         /// <summary>
         /// Unique ID of the POS.
         /// </summary>
-        public long PosId { get; set; }
+        public Identifier PosId { get; set; }
 
         /// <summary>
         /// Nonce to prevent repetition.
@@ -32,7 +32,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Unique ID of the POS.
             /// </summary>
-            public long PosId { get; set; }
+            public Identifier PosId { get; set; }
 
             /// <summary>
             /// Nonce to prevent repetition.
