@@ -126,6 +126,7 @@ namespace WomPlatform.Connector {
                     _client = new RestClient(string.Format("http://{0}/api/v1",
                         _womDomain
                     ));
+                    _client.UseSerializer(() => new JsonRestSerializer());
                 }
                 return _client;
             }
