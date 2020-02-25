@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
 
 namespace WomPlatform.Connector {
 
-    internal static class RestClientExtensions {
+    internal static class ClientExtensions {
 
-        public static RestRequest CreateJsonPostRequest(this RestClient client, string urlPath, object jsonBody) {
+        public static RestRequest CreateJsonPostRequest(this Client _, string urlPath, object jsonBody) {
             var request = new RestRequest(urlPath, Method.POST) {
                 RequestFormat = DataFormat.Json
             };
@@ -20,12 +21,32 @@ namespace WomPlatform.Connector {
             return request;
         }
 
-        public static async Task<T> PerformRequest<T>(this RestClient client, RestRequest request) {
+        public static async Task<T> PerformRequest<T>(this Client client, RestRequest request) {
             if(client is null) {
                 throw new ArgumentNullException(nameof(client));
             }
 
-            var response = await client.ExecutePostTaskAsync(request).ConfigureAwait(false);
+            client.Logger.LogTrace(LoggingEvents.Communication,
+                "HTTP request {0} {1}",
+                request.Method.ToString(),
+                client.RestClient.BuildUri(request));
+
+            var response = await client.RestClient.ExecutePostAsync(request).ConfigureAwait(false);
+
+            client.Logger.LogTrace(LoggingEvents.Communication,
+                "Request body ({0}): {1}",
+                request.Body.ContentType,
+                request.Body.Value);
+
+            client.Logger.LogTrace(LoggingEvents.Communication,
+                "HTTP response {0}",
+                response.StatusCode);
+
+            client.Logger.LogTrace(LoggingEvents.Communication,
+                "Response body ({0}): {1}",
+                response.ContentType,
+                response.Content);
+
             if(response.StatusCode != System.Net.HttpStatusCode.OK) {
                 throw new InvalidOperationException(string.Format("API status code {0}", response.StatusCode));
             }
@@ -38,7 +59,7 @@ namespace WomPlatform.Connector {
                 throw new ArgumentNullException(nameof(client));
             }
 
-            var response = await client.ExecutePostTaskAsync(request).ConfigureAwait(false);
+            var response = await client.ExecutePostAsync(request).ConfigureAwait(false);
             if(response.StatusCode != System.Net.HttpStatusCode.OK) {
                 throw new InvalidOperationException(string.Format("API status code {0}", response.StatusCode));
             }

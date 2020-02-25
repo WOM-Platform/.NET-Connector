@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace WomPlatform.Connector {
 
     static class LoggingEvents {
@@ -11,6 +7,7 @@ namespace WomPlatform.Connector {
         public const int PointOfSale = 2002;
         public const int Pocket = 2003;
         public const int Cryptography = 2010;
+        public const int Communication = 2020;
 
     }
 

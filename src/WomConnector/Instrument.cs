@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Org.BouncyCastle.Crypto;
 using WomPlatform.Connector.Models;
 using Microsoft.Extensions.Logging;
+using System.Linq;
+using RestSharp;
 
 namespace WomPlatform.Connector {
 
@@ -33,7 +35,7 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            var request = _client.RestClient.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
+            var request = _client.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
                 SourceId = new Identifier(_id),
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
@@ -47,10 +49,10 @@ namespace WomPlatform.Connector {
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing voucher creation request");
 
-            var response = await _client.RestClient.PerformRequest<VoucherCreateResponse>(request);
+            var response = await _client.PerformRequest<VoucherCreateResponse>(request);
             var responseContent = _client.Crypto.Decrypt<VoucherCreateResponse.Content>(response.Payload, _privateKey);
 
-            request = _client.RestClient.CreateJsonPostRequest("voucher/verify", new VoucherVerifyPayload {
+            request = _client.CreateJsonPostRequest("voucher/verify", new VoucherVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new VoucherVerifyPayload.Content {
                     Otc = responseContent.Otc
                 }, _client.RegistryPublicKey)

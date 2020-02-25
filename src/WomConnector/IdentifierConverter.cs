@@ -14,7 +14,7 @@ namespace WomPlatform.Connector {
                 return new Identifier((string)reader.Value);
             }
             else {
-                throw new ArgumentException("Expected numeric or string value for voucher ID");
+                throw new ArgumentException(string.Format("Expected numeric or string value for voucher ID, found type {0} value {1}", reader.TokenType, reader.Value?.ToString()));
             }
         }
 

@@ -40,7 +40,7 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            var request = _client.RestClient.CreateJsonPostRequest("payment/register", new PaymentRegisterPayload {
+            var request = _client.CreateJsonPostRequest("payment/register", new PaymentRegisterPayload {
                 PosId = new Identifier(_id),
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new PaymentRegisterPayload.Content {
@@ -57,10 +57,10 @@ namespace WomPlatform.Connector {
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing payment creation request");
 
-            var response = await _client.RestClient.PerformRequest<PaymentRegisterResponse>(request);
+            var response = await _client.PerformRequest<PaymentRegisterResponse>(request);
             var responseContent = _client.Crypto.Decrypt<PaymentRegisterResponse.Content>(response.Payload, _privateKey);
 
-            request = _client.RestClient.CreateJsonPostRequest("payment/verify", new PaymentVerifyPayload {
+            request = _client.CreateJsonPostRequest("payment/verify", new PaymentVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentVerifyPayload.Content {
                     Otc = responseContent.Otc
                 }, _client.RegistryPublicKey)
