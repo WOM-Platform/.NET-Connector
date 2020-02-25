@@ -25,6 +25,7 @@ namespace WomPlatform.Connector.Models {
             /// ID of the source.
             /// </summary>
             [JsonProperty("sourceId", Required = Required.Always)]
+            [JsonConverter(typeof(IdentifierConverter))]
             public Identifier SourceId { get; set; }
 
             /// <summary>
@@ -51,6 +52,7 @@ namespace WomPlatform.Connector.Models {
             /// Unique voucher ID.
             /// </summary>
             [JsonProperty("id", Required = Required.Always)]
+            [JsonConverter(typeof(IdentifierConverter))]
             public Identifier Id { get; set; }
 
             /// <summary>

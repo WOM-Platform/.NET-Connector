@@ -45,6 +45,7 @@ namespace WomPlatform.Connector.Models {
         public class VoucherInfo {
 
             [JsonProperty("id", Required = Required.Always)]
+            [JsonConverter(typeof(IdentifierConverter))]
             public Identifier Id { get; set; }
 
             [JsonProperty("secret", Required = Required.Always)]

@@ -28,7 +28,6 @@ namespace WomPlatform.Connector {
                     Formatting = Formatting.None,
                     NullValueHandling = NullValueHandling.Ignore
                 };
-                ret.Converters.Add(new IdentifierConverter());
                 return ret;
             }
         }

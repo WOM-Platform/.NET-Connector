@@ -25,6 +25,7 @@ namespace WomPlatform.Connector.Models {
             /// Unique ID of the POS.
             /// </summary>
             [JsonProperty("posId", Required = Required.Always)]
+            [JsonConverter(typeof(IdentifierConverter))]
             public Identifier PosId { get; set; }
 
             /// <summary>

@@ -14,6 +14,7 @@ namespace WomPlatform.Connector.Models {
         /// Unique ID of the source.
         /// </summary>
         [JsonProperty("sourceId", Required = Required.Always)]
+        [JsonConverter(typeof(IdentifierConverter))]
         public Identifier SourceId { get; set; }
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace WomPlatform.Connector.Models {
             /// Unique ID of the source.
             /// </summary>
             [JsonProperty("sourceId", Required = Required.Always)]
+            [JsonConverter(typeof(IdentifierConverter))]
             public Identifier SourceId { get; set; }
 
             /// <summary>
