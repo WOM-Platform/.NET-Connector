@@ -45,7 +45,7 @@ namespace WomPlatform.Connector.Models {
             /// <summary>
             /// Password specified by user.
             /// </summary>
-            [JsonProperty("password", Required = Required.Always)]
+            [JsonProperty("password")]
             public string Password { get; set; }
 
             /// <summary>
