@@ -20,6 +20,10 @@ namespace WomPlatform.Connector.Models {
 
         public static implicit operator string(Identifier vId) => vId.Id;
 
+        public static implicit operator Identifier(string sId) => new Identifier(sId);
+
+        public static implicit operator Identifier(long id) => new Identifier(id);
+
         public override bool Equals(object obj) {
             return Id.Equals(obj);
         }
