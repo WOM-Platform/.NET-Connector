@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Crypto;
 using WomPlatform.Connector.Models;
-using Microsoft.Extensions.Logging;
-using System.Linq;
-using RestSharp;
 
 namespace WomPlatform.Connector {
 
     public class Instrument {
 
         private readonly Client _client;
-        private readonly long _id;
+        private readonly Identifier _id;
         private readonly AsymmetricKeyParameter _privateKey;
 
-        internal Instrument(Client c, long id, AsymmetricKeyParameter privateKey) {
+        internal Instrument(Client c, Identifier id, AsymmetricKeyParameter privateKey) {
             _client = c;
             _id = id;
             _privateKey = privateKey ?? throw new ArgumentNullException(nameof(privateKey));
@@ -36,10 +34,10 @@ namespace WomPlatform.Connector {
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
             var request = _client.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
-                SourceId = new Identifier(_id),
+                SourceId = _id,
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
-                    SourceId = new Identifier(_id),
+                    SourceId = _id,
                     Nonce = effectiveNonce,
                     Password = password,
                     Vouchers = vouchers

@@ -11,10 +11,10 @@ namespace WomPlatform.Connector {
     public class PointOfSale {
 
         private readonly Client _client;
-        private readonly long _id;
+        private readonly Identifier _id;
         private readonly AsymmetricKeyParameter _privateKey;
 
-        internal PointOfSale(Client c, long id, AsymmetricKeyParameter privateKey) {
+        internal PointOfSale(Client c, Identifier id, AsymmetricKeyParameter privateKey) {
             _client = c;
             _id = id;
             _privateKey = privateKey ?? throw new ArgumentNullException(nameof(privateKey));
@@ -41,10 +41,10 @@ namespace WomPlatform.Connector {
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
             var request = _client.CreateJsonPostRequest("payment/register", new PaymentRegisterPayload {
-                PosId = new Identifier(_id),
+                PosId = _id,
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new PaymentRegisterPayload.Content {
-                    PosId = new Identifier(_id),
+                    PosId = _id,
                     Nonce = effectiveNonce,
                     Password = password,
                     Amount = amount,
