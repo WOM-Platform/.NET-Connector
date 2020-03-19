@@ -7,6 +7,10 @@ namespace WomPlatform.Connector.Models {
         public string Id;
 
         public Identifier(string id) {
+            if(id == null) {
+                throw new ArgumentNullException(nameof(id));
+            }
+
             Id = id;
         }
 
@@ -34,6 +38,22 @@ namespace WomPlatform.Connector.Models {
 
         public override string ToString() {
             return Id;
+        }
+
+        public static bool operator ==(Identifier a, Identifier b) {
+            return a.Id.Equals(b.Id, StringComparison.InvariantCulture);
+        }
+
+        public static bool operator !=(Identifier a, Identifier b) {
+            return !a.Id.Equals(b.Id, StringComparison.InvariantCulture);
+        }
+
+        public static bool operator ==(Identifier a, string b) {
+            return a.Id.Equals(b, StringComparison.InvariantCulture);
+        }
+
+        public static bool operator !=(Identifier a, string b) {
+            return !a.Id.Equals(b, StringComparison.InvariantCulture);
         }
 
     }
