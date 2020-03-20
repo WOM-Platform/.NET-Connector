@@ -62,7 +62,7 @@ namespace WomConnector.Tester {
             }
         }
 
-        public static Instrument CreateInstrument(long sourceId, string sourceKeyPath) {
+        public static Instrument CreateInstrument(string sourceId, string sourceKeyPath) {
             AsymmetricCipherKeyPair keys = null;
             using(var fs = new FileStream(sourceKeyPath, FileMode.Open)) {
                 keys = KeyUtil.LoadCipherKeyPairFromPem(fs);
@@ -71,17 +71,25 @@ namespace WomConnector.Tester {
             return Client.CreateInstrument(sourceId, keys.Private);
         }
 
+        public static Instrument GenerateInstrument() {
+            return CreateInstrument("5e74203f5f21bb265a2d26bd", "keys/source1.pem");
+        }
+
         public static Pocket CreatePocket() {
             return Client.CreatePocket();
         }
 
-        public static PointOfSale CreatePos(long posId, string posKeyPath) {
+        public static PointOfSale CreatePos(string posId, string posKeyPath) {
             AsymmetricCipherKeyPair keys = null;
             using(var fs = new FileStream(posKeyPath, FileMode.Open)) {
                 keys = KeyUtil.LoadCipherKeyPairFromPem(fs);
             }
 
             return Client.CreatePos(posId, keys.Private);
+        }
+
+        public static PointOfSale GeneratePos() {
+            return CreatePos("5e74205c5f21bb265a2d26d8", "keys/pos1.pem");
         }
 
     }

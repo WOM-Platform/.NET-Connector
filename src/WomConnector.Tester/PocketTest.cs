@@ -11,12 +11,22 @@ namespace WomConnector.Tester {
 
         [Test]
         public async Task CreateSimpleVoucher() {
-            var (otc, password) = await InstrumentTest.GenerateVoucherRequestSource1(1);
-
             var pocket = Util.CreatePocket();
+
+            var instrument = Util.GenerateInstrument();
+            var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                new VoucherCreatePayload.VoucherInfo {
+                    Aim = "E",
+                    Count = 10,
+                    Latitude = 43.72621,
+                    Longitude = 12.63633,
+                    Timestamp = DateTime.UtcNow
+                }
+            });
+
             await pocket.CollectVouchers(otc, password);
 
-            Assert.AreEqual(1, pocket.VoucherCount);
+            Assert.AreEqual(10, pocket.VoucherCount);
         }
 
     }

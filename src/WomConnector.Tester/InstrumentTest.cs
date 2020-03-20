@@ -10,13 +10,18 @@ namespace WomConnector.Tester {
 
     public class InstrumentTest {
 
-        public static async Task<(Guid otc, string password)> GenerateVoucherRequestSource1(int count) {
-            var instrument = Util.CreateInstrument(1, "keys/source1.pem");
+        private Instrument _instrument;
 
-            var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+        [SetUp]
+        public void Setup() {
+            _instrument = Util.GenerateInstrument();
+        }
+
+        public async Task<(Guid otc, string password)> GenerateVoucherRequestSource1(int count) {
+            var (otc, password) = await _instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
-                    Count = 1,
+                    Count = count,
                     Latitude = 43.72621,
                     Longitude = 12.63633,
                     Timestamp = DateTime.UtcNow
@@ -35,10 +40,10 @@ namespace WomConnector.Tester {
 
         [Test]
         public void FailSourceKey() {
-            var instrument = Util.CreateInstrument(1, "keys/pos1.pem");
+            var wrongInstrument = Util.CreateInstrument("5e74203f5f21bb265a2d26bd", "keys/pos1.pem");
 
             Assert.ThrowsAsync<InvalidCipherTextException>(async () => {
-                var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                var (otc, password) = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
@@ -54,10 +59,10 @@ namespace WomConnector.Tester {
 
         [Test]
         public void FailSourceId() {
-            var instrument = Util.CreateInstrument(2, "keys/source1.pem");
+            var wrongInstrument = Util.CreateInstrument("5e74203f5f21bb265a2d27bd", "keys/source1.pem");
 
-            Assert.ThrowsAsync<InvalidCipherTextException>(async () => {
-                var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            Assert.ThrowsAsync<InvalidOperationException>(async () => {
+                var (otc, password) = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
