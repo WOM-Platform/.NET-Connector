@@ -5,7 +5,7 @@
     <AssemblyName>WomPlatform.Connector</AssemblyName>
     <RootNamespace>WomPlatform.Connector</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.1.1</Version>
+    <Version>3.0</Version>
     <Authors>WOM Platform</Authors>
     <Company>WOM Platform</Company>
     <Product />
