@@ -23,7 +23,7 @@ namespace WomPlatform.Connector {
             }
         }
 
-        public async Task<(Guid Otc, string Password)> RequestPayment(int amount,
+        public async Task<PaymentRequest> RequestPayment(int amount,
             string pocketAckUrl, string posAckUrl = null,
             SimpleFilter filter = null, bool isPersistent = false,
             string nonce = null, string password = null) {
@@ -74,7 +74,7 @@ namespace WomPlatform.Connector {
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");
 
-            return (responseContent.Otc, responseContent.Password);
+            return new PaymentRequest(_client, responseContent.Otc, responseContent.Password);
         }
 
     }

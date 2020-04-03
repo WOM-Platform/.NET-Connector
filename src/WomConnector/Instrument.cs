@@ -21,7 +21,7 @@ namespace WomPlatform.Connector {
             }
         }
 
-        public async Task<(Guid Otc, string Password)> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers,
+        public async Task<VoucherRequest> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers,
             string nonce = null, string password = null) {
 
             if(vouchers is null || vouchers.Length == 0) {
@@ -64,7 +64,7 @@ namespace WomPlatform.Connector {
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");
 
-            return (responseContent.Otc, responseContent.Password);
+            return new VoucherRequest(_client, responseContent.Otc, responseContent.Password);
         }
 
     }

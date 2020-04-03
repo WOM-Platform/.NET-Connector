@@ -61,10 +61,13 @@ namespace WomPlatform.Connector {
         /// </summary>
         public const string DefaultWomDomain = "wom.social";
 
-        private readonly string _womDomain;
+        /// <summary>
+        /// Gets the client's WOM domain.
+        /// </summary>
+        public string WomDomain { get; }
 
         private Client(string womDomain, ILoggerFactory loggerFactory) {
-            _womDomain = womDomain;
+            WomDomain = womDomain;
             Logger = loggerFactory.CreateLogger<Client>();
             Crypto = new CryptoProvider(loggerFactory);
         }
@@ -120,10 +123,10 @@ namespace WomPlatform.Connector {
         internal protected RestClient RestClient {
             get {
                 if(_client is null) {
-                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client for WOM domain {0}", _womDomain);
+                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client for WOM domain {0}", WomDomain);
 
                     _client = new RestClient(string.Format("http://{0}/api/v1",
-                        _womDomain
+                        WomDomain
                     ));
                     _client.UseSerializer(() => new JsonRestSerializer());
                 }
