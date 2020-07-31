@@ -40,7 +40,7 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            var request = _client.CreateJsonPostRequest("payment/register", new PaymentRegisterPayload {
+            var response = await _client.PerformOperation<PaymentRegisterResponse>("v1/payment/register", new PaymentRegisterPayload {
                 PosId = _id,
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new PaymentRegisterPayload.Content {
@@ -51,25 +51,22 @@ namespace WomPlatform.Connector {
                     SimpleFilter = filter,
                     PocketAckUrl = pocketAckUrl,
                     PosAckUrl = posAckUrl
-                }, _client.RegistryPublicKey)
+                }, await _client.GetRegistryPublicKey())
             });
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing payment creation request");
 
-            var response = await _client.PerformRequest<PaymentRegisterResponse>(request);
             var responseContent = _client.Crypto.Decrypt<PaymentRegisterResponse.Content>(response.Payload, _privateKey);
 
-            request = _client.CreateJsonPostRequest("payment/verify", new PaymentVerifyPayload {
+            await _client.PerformOperation("v1/payment/verify", new PaymentVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentVerifyPayload.Content {
                     Otc = responseContent.Otc
-                }, _client.RegistryPublicKey)
+                }, await _client.GetRegistryPublicKey())
             });
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing payment verification request");
-
-            await _client.RestClient.PerformRequest(request);
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -56,6 +57,13 @@ namespace WomPlatform.Connector {
             return reader.ReadObject() as T;
         }
 
+        private T LoadFromPem<T>(string pem) where T : class {
+            using(StringReader sr = new StringReader(pem)) {
+                var reader = new PemReader(sr);
+                return reader.ReadObject() as T;
+            }
+        }
+
         /// <summary>
         /// Default public WOM domain (wom.social).
         /// </summary>
@@ -66,10 +74,21 @@ namespace WomPlatform.Connector {
         /// </summary>
         public string WomDomain { get; }
 
-        private Client(string womDomain, ILoggerFactory loggerFactory) {
+        /// <summary>
+        /// Creates a new WOM client on a given WOM domain.
+        /// </summary>
+        public Client(string womDomain, ILoggerFactory loggerFactory) {
             WomDomain = womDomain;
             Logger = loggerFactory.CreateLogger<Client>();
             Crypto = new CryptoProvider(loggerFactory);
+            _registryPublicKey = null;
+        }
+
+        /// <summary>
+        /// Creates a new WOM client on the default WOM domain (wom.social).
+        /// </summary>
+        public Client(ILoggerFactory loggerFactory)
+            : this(DefaultWomDomain, loggerFactory) {
         }
 
         /// <summary>
@@ -78,7 +97,7 @@ namespace WomPlatform.Connector {
         public Client(ILoggerFactory loggerFactory, AsymmetricKeyParameter registryKey)
             : this(DefaultWomDomain, loggerFactory) {
 
-            RegistryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
+            _registryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
         }
 
         /// <summary>
@@ -88,7 +107,7 @@ namespace WomPlatform.Connector {
             : this(DefaultWomDomain, loggerFactory) {
 
             var key = LoadFromPem<AsymmetricKeyParameter>(registryKeyStream);
-            RegistryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
+            _registryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
         }
 
         /// <summary>
@@ -97,7 +116,7 @@ namespace WomPlatform.Connector {
         public Client(string womDomain, ILoggerFactory loggerFactory, AsymmetricKeyParameter registryKey)
             : this(womDomain, loggerFactory) {
 
-            RegistryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
+            _registryPublicKey = registryKey ?? throw new ArgumentNullException(nameof(registryKey));
         }
 
         /// <summary>
@@ -107,31 +126,119 @@ namespace WomPlatform.Connector {
             : this(womDomain, loggerFactory) {
 
             var key = LoadFromPem<AsymmetricKeyParameter>(registryKeyStream);
-            RegistryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
+            _registryPublicKey = key ?? throw new ArgumentException(nameof(registryKeyStream));
         }
 
-        /// <summary>
-        /// The Registry's public key.
-        /// </summary>
-        public AsymmetricKeyParameter RegistryPublicKey { get; private set; }
+        private AsymmetricKeyParameter _registryPublicKey = null;
+
+        public async Task<AsymmetricKeyParameter> GetRegistryPublicKey() {
+            if(_registryPublicKey != null) {
+                return _registryPublicKey;
+            }
+
+            var pemKey = await FetchRegistryPublicKey();
+            _registryPublicKey = LoadFromPem<AsymmetricKeyParameter>(pemKey);
+            return _registryPublicKey;
+        }
 
         internal protected ILogger<Client> Logger { get; }
 
         public CryptoProvider Crypto { get; private set; }
 
-        private RestClient _client = null;
-        internal protected RestClient RestClient {
+        private RestClient _httpClient = null;
+        protected RestClient HttpClient {
             get {
-                if(_client is null) {
-                    Logger.LogDebug(LoggingEvents.Client, "Creating new REST client for WOM domain {0}", WomDomain);
+                if(_httpClient is null) {
+                    Logger.LogDebug(LoggingEvents.Client, "Creating new HTTP client for WOM domain {0}", WomDomain);
 
-                    _client = new RestClient(string.Format("http://{0}/api/v1",
+                    _httpClient = new RestClient(string.Format("http://{0}/api",
                         WomDomain
                     ));
-                    _client.UseSerializer(() => new JsonRestSerializer());
+                    _httpClient.UseSerializer(() => new JsonRestSerializer());
                 }
-                return _client;
+                return _httpClient;
             }
+        }
+
+        private RestClient _httpsClient = null;
+        protected RestClient HttpsClient {
+            get {
+                if(_httpsClient is null) {
+                    Logger.LogDebug(LoggingEvents.Client, "Creating new HTTPS client for WOM domain {0}", WomDomain);
+
+                    _httpsClient = new RestClient(string.Format("https://{0}/api",
+                        WomDomain
+                    ));
+                    _httpsClient.UseSerializer(() => new JsonRestSerializer());
+                }
+                return _httpsClient;
+            }
+        }
+
+        internal protected async Task<IRestResponse> PerformOperation(string urlPath, object jsonBody) {
+            var request = new RestRequest(urlPath, Method.POST) {
+                RequestFormat = DataFormat.Json
+            };
+            request.AddHeader("Accept", "application/json");
+            if(jsonBody != null) {
+                request.AddJsonBody(jsonBody);
+            }
+
+            return await PerformRequest(HttpClient, request);
+        }
+
+        /// <summary>
+        /// Performs a Registry operation, as a POST request with JSON body
+        /// and expecting a JSON response.
+        /// Ensures that the Registry is correctly configured and its public certificate
+        /// has been loaded.
+        /// </summary>
+        internal protected async Task<T> PerformOperation<T>(string urlPath, object jsonBody) {
+            var response = await PerformOperation(urlPath, jsonBody);
+
+            return JsonConvert.DeserializeObject<T>(response.Content);
+        }
+
+        /// <summary>
+        /// Perform a simple client request.
+        /// </summary>
+        internal protected async Task<IRestResponse> PerformRequest(RestClient client, RestRequest request) {
+            Logger.LogTrace(LoggingEvents.Communication,
+                "HTTP request {0} {1}",
+                request.Method.ToString(),
+                client.BuildUri(request));
+
+            if(request.Body != null) {
+                Logger.LogTrace(LoggingEvents.Communication,
+                    "Request body ({0}): {1}",
+                    request.Body.ContentType,
+                    request.Body.Value);
+            }
+
+            var response = await client.ExecuteAsync(request).ConfigureAwait(false);
+
+            Logger.LogTrace(LoggingEvents.Communication,
+                "HTTP response {0}",
+                response.StatusCode);
+
+            Logger.LogTrace(LoggingEvents.Communication,
+                "Response body ({0}): {1}",
+                response.ContentType,
+                response.Content);
+
+            if(response.StatusCode != System.Net.HttpStatusCode.OK) {
+                throw new InvalidOperationException(string.Format("API status code {0}", response.StatusCode));
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Loads the registry's public key from the server.
+        /// </summary>
+        public async Task<string> FetchRegistryPublicKey() {
+            var response = await PerformRequest(HttpsClient, new RestRequest("v1/auth/key", Method.GET));
+            return response.Content;
         }
 
         /// <summary>

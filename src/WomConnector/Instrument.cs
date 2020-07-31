@@ -33,7 +33,7 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            var request = _client.CreateJsonPostRequest("voucher/create", new VoucherCreatePayload {
+            var response = await _client.PerformOperation<VoucherCreateResponse>("v1/voucher/create", new VoucherCreatePayload {
                 SourceId = _id,
                 Nonce = effectiveNonce,
                 Payload = _client.Crypto.Encrypt(new VoucherCreatePayload.Content {
@@ -41,25 +41,22 @@ namespace WomPlatform.Connector {
                     Nonce = effectiveNonce,
                     Password = password,
                     Vouchers = vouchers
-                }, _client.RegistryPublicKey)
+                }, await _client.GetRegistryPublicKey())
             });
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing voucher creation request");
 
-            var response = await _client.PerformRequest<VoucherCreateResponse>(request);
             var responseContent = _client.Crypto.Decrypt<VoucherCreateResponse.Content>(response.Payload, _privateKey);
 
-            request = _client.CreateJsonPostRequest("voucher/verify", new VoucherVerifyPayload {
+            await _client.PerformOperation<VoucherVerifyPayload>("v1/voucher/verify", new VoucherVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new VoucherVerifyPayload.Content {
                     Otc = responseContent.Otc
-                }, _client.RegistryPublicKey)
+                }, await _client.GetRegistryPublicKey())
             });
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Performing voucher verification request");
-
-            await _client.RestClient.PerformRequest(request);
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");

@@ -14,7 +14,7 @@ namespace WomConnector.Tester {
             var pocket = Util.CreatePocket();
 
             var instrument = Util.GenerateInstrument();
-            var (otc, password) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 10,
@@ -24,7 +24,7 @@ namespace WomConnector.Tester {
                 }
             });
 
-            await pocket.CollectVouchers(otc, password);
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
 
             Assert.AreEqual(10, pocket.VoucherCount);
         }

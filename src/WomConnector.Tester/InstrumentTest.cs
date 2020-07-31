@@ -18,7 +18,7 @@ namespace WomConnector.Tester {
         }
 
         public async Task<(Guid otc, string password)> GenerateVoucherRequestSource1(int count) {
-            var (otc, password) = await _instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await _instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = count,
@@ -28,7 +28,7 @@ namespace WomConnector.Tester {
                 }
             });
 
-            return (otc, password);
+            return (response.OtcGen, response.Password);
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace WomConnector.Tester {
             var wrongInstrument = Util.CreateInstrument("5e74203f5f21bb265a2d26bd", "keys/pos1.pem");
 
             Assert.ThrowsAsync<InvalidCipherTextException>(async () => {
-                var (otc, password) = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                var response = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
@@ -53,7 +53,7 @@ namespace WomConnector.Tester {
                 }
             });
 
-                Console.WriteLine("Voucher {0} pwd {1}", otc, password);
+                Console.WriteLine("Voucher {0} pwd {1}", response.OtcGen, response.Password);
             });
         }
 
@@ -62,7 +62,7 @@ namespace WomConnector.Tester {
             var wrongInstrument = Util.CreateInstrument("5e74203f5f21bb265a2d27bd", "keys/source1.pem");
 
             Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                var (otc, password) = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                var response = await wrongInstrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
@@ -72,7 +72,7 @@ namespace WomConnector.Tester {
                 }
             });
 
-                Console.WriteLine("Voucher {0} pwd {1}", otc, password);
+                Console.WriteLine("Voucher {0} pwd {1}", response.OtcGen, response.Password);
             });
         }
 

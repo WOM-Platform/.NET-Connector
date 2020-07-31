@@ -19,9 +19,9 @@ namespace WomConnector.Tester {
 
         [Test]
         public async Task CreateSimplePayment() {
-            var (otc, password) = await _pos.RequestPayment(1, "https://example.org");
+            var response = await _pos.RequestPayment(1, "https://example.org");
 
-            Console.WriteLine("Payment {0} pwd {1}", otc, password);
+            Console.WriteLine("Payment {0} pwd {1}", response.OtcPay, response.Password);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace WomConnector.Tester {
             var pocket = Util.CreatePocket();
 
             var instrument = Util.GenerateInstrument();
-            (var otcGen, var pwd) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "H",
                     Latitude = 10,
@@ -39,22 +39,22 @@ namespace WomConnector.Tester {
                 }
             });
 
-            await pocket.CollectVouchers(otcGen, pwd);
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
             Assert.AreEqual(1, pocket.VoucherCount);
 
             var singleVoucher = pocket.Vouchers[0];
 
-            var (otcPay1, payPwd1) = await _pos.RequestPayment(1, "https://example.org");
+            var respPay1 = await _pos.RequestPayment(1, "https://example.org");
 
-            string ackUrl = await pocket.PayWithRandomVouchers(otcPay1, payPwd1);
+            string ackUrl = await pocket.PayWithRandomVouchers(respPay1.OtcPay, respPay1.Password);
             Assert.AreEqual(0, pocket.VoucherCount);
             Assert.AreEqual("https://example.org", ackUrl);
 
             // Test double spending
-            var (otcPay2, payPwd2) = await _pos.RequestPayment(1, "https://example.org");
+            var respPay2 = await _pos.RequestPayment(1, "https://example.org");
 
             Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await pocket.Pay(otcPay2, payPwd2, new Voucher[] { singleVoucher });
+                await pocket.Pay(respPay2.OtcPay, respPay2.Password, new Voucher[] { singleVoucher });
             });
             
         }
@@ -64,7 +64,7 @@ namespace WomConnector.Tester {
             var pocket = Util.CreatePocket();
 
             var instrument = Util.GenerateInstrument();
-            var (reqOtc, reqPassword) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
@@ -81,17 +81,17 @@ namespace WomConnector.Tester {
                 }
             });
 
-            await pocket.CollectVouchers(reqOtc, reqPassword);
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
             Assert.AreEqual(3, pocket.VoucherCount);
 
             var pos = Util.GeneratePos();
-            var (payOtc, payPassword) = await pos.RequestPayment(2, "https://example.org",
+            var responsePay = await pos.RequestPayment(2, "https://example.org",
                 filter: new SimpleFilter {
                     Aim = "H"
                 }
             );
 
-            string ackUrl = await pocket.PayWithRandomVouchers(payOtc, payPassword);
+            string ackUrl = await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
             Assert.AreEqual(1, pocket.VoucherCount);
             Assert.AreEqual("https://example.org", ackUrl);
             Assert.AreEqual("E", pocket.Vouchers[0].Aim);
@@ -102,7 +102,7 @@ namespace WomConnector.Tester {
             var pocket = Util.CreatePocket();
 
             var instrument = Util.GenerateInstrument();
-            var (reqOtc, reqPassword) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "E",
                     Count = 1,
@@ -119,14 +119,14 @@ namespace WomConnector.Tester {
                 }
             });
 
-            await pocket.CollectVouchers(reqOtc, reqPassword);
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
             Assert.AreEqual(3, pocket.VoucherCount);
 
             var pos = Util.GeneratePos();
-            var (payOtc, payPassword) = await pos.RequestPayment(4, "https://example.org");
+            var responsePay = await pos.RequestPayment(4, "https://example.org");
 
             Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await pocket.PayWithRandomVouchers(payOtc, payPassword);
+                await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
             });
             
             Assert.AreEqual(3, pocket.VoucherCount);
@@ -137,7 +137,7 @@ namespace WomConnector.Tester {
             var pocket = Util.CreatePocket();
 
             var instrument = Util.GenerateInstrument();
-            var (reqOtc, reqPassword) = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
                 new VoucherCreatePayload.VoucherInfo {
                     Aim = "H",
                     Count = 2,
@@ -154,11 +154,11 @@ namespace WomConnector.Tester {
                 }
             });
 
-            await pocket.CollectVouchers(reqOtc, reqPassword);
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
             Assert.AreEqual(4, pocket.VoucherCount);
 
             var pos = Util.GeneratePos();
-            var (payOtc, payPassword) = await pos.RequestPayment(3, "https://example.org",
+            var responsePay = await pos.RequestPayment(3, "https://example.org",
                 filter: new SimpleFilter {
                     Aim = "H",
                     Bounds = new Bounds {
@@ -169,7 +169,7 @@ namespace WomConnector.Tester {
             );
 
             Assert.ThrowsAsync<InvalidOperationException>(async () => {
-                await pocket.PayWithRandomVouchers(payOtc, payPassword);
+                await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
             });
 
             Assert.AreEqual(4, pocket.VoucherCount);
