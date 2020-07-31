@@ -40,6 +40,9 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
+            _client.Logger.LogDebug(LoggingEvents.Instrument,
+                "Performing payment creation request");
+
             var response = await _client.PerformOperation<PaymentRegisterResponse>("v1/payment/register", new PaymentRegisterPayload {
                 PosId = _id,
                 Nonce = effectiveNonce,
@@ -53,20 +56,16 @@ namespace WomPlatform.Connector {
                     PosAckUrl = posAckUrl
                 }, await _client.GetRegistryPublicKey())
             });
+            var responseContent = _client.Crypto.Decrypt<PaymentRegisterResponse.Content>(response.Payload, _privateKey);
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
-                "Performing payment creation request");
-
-            var responseContent = _client.Crypto.Decrypt<PaymentRegisterResponse.Content>(response.Payload, _privateKey);
+                "Performing payment verification request");
 
             await _client.PerformOperation("v1/payment/verify", new PaymentVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentVerifyPayload.Content {
                     Otc = responseContent.Otc
                 }, await _client.GetRegistryPublicKey())
             });
-
-            _client.Logger.LogDebug(LoggingEvents.Instrument,
-                "Performing payment verification request");
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
                 "Voucher creation succeeded");

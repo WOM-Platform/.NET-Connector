@@ -11,6 +11,9 @@ using RestSharp;
 
 namespace WomPlatform.Connector {
 
+    /// <summary>
+    /// WOM client.
+    /// </summary>
     public class Client {
 
         /// <summary>
@@ -131,6 +134,9 @@ namespace WomPlatform.Connector {
 
         private AsymmetricKeyParameter _registryPublicKey = null;
 
+        /// <summary>
+        /// Get the Registry's public key.
+        /// </summary>
         public async Task<AsymmetricKeyParameter> GetRegistryPublicKey() {
             if(_registryPublicKey != null) {
                 return _registryPublicKey;
@@ -143,8 +149,14 @@ namespace WomPlatform.Connector {
 
         internal protected ILogger<Client> Logger { get; }
 
+        /// <summary>
+        /// Get the client's crypto provider.
+        /// </summary>
         public CryptoProvider Crypto { get; private set; }
 
+        /// <summary>
+        /// REST client for HTTP requests.
+        /// </summary>
         private RestClient _httpClient = null;
         protected RestClient HttpClient {
             get {
@@ -160,6 +172,9 @@ namespace WomPlatform.Connector {
             }
         }
 
+        /// <summary>
+        /// REST client for HTTPS requests.
+        /// </summary>
         private RestClient _httpsClient = null;
         protected RestClient HttpsClient {
             get {
@@ -190,8 +205,6 @@ namespace WomPlatform.Connector {
         /// <summary>
         /// Performs a Registry operation, as a POST request with JSON body
         /// and expecting a JSON response.
-        /// Ensures that the Registry is correctly configured and its public certificate
-        /// has been loaded.
         /// </summary>
         internal protected async Task<T> PerformOperation<T>(string urlPath, object jsonBody) {
             var response = await PerformOperation(urlPath, jsonBody);
@@ -200,7 +213,7 @@ namespace WomPlatform.Connector {
         }
 
         /// <summary>
-        /// Perform a simple client request.
+        /// Perform a simple client request and verifies that the response is #200.
         /// </summary>
         internal protected async Task<IRestResponse> PerformRequest(RestClient client, RestRequest request) {
             Logger.LogTrace(LoggingEvents.Communication,

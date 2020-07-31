@@ -51,6 +51,9 @@ namespace WomPlatform.Connector {
 
             var sessionKey = _client.Crypto.GenerateSessionKey();
 
+            _client.Logger.LogDebug(LoggingEvents.Pocket,
+                "Performing voucher redeem request");
+
             var response = await _client.PerformOperation<VoucherRedeemResponse>("v1/voucher/redeem", new VoucherRedeemPayload {
                 Payload = _client.Crypto.Encrypt(new VoucherRedeemPayload.Content {
                     Otc = otc,
@@ -58,10 +61,6 @@ namespace WomPlatform.Connector {
                     SessionKey = sessionKey.ToBase64()
                 }, await _client.GetRegistryPublicKey())
             });
-
-            _client.Logger.LogDebug(LoggingEvents.Pocket,
-                "Performing voucher redeem request");
-
             var responseContent = _client.Crypto.Decrypt<VoucherRedeemResponse.Content>(response.Payload, sessionKey);
 
             _client.Logger.LogDebug(LoggingEvents.Pocket,
@@ -82,6 +81,9 @@ namespace WomPlatform.Connector {
 
             var sessionKey = _client.Crypto.GenerateSessionKey();
 
+            _client.Logger.LogDebug(LoggingEvents.Pocket,
+                "Performing payment information request");
+
             var response = await _client.PerformOperation<PaymentInfoResponse>("v1/payment/info", new PaymentInfoPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentInfoPayload.Content {
                     Otc = otc,
@@ -89,10 +91,6 @@ namespace WomPlatform.Connector {
                     SessionKey = sessionKey.ToBase64()
                 }, await _client.GetRegistryPublicKey())
             });
-
-            _client.Logger.LogDebug(LoggingEvents.Pocket,
-                "Performing payment information request");
-
             var paymentInformation = _client.Crypto.Decrypt<PaymentInfoResponse.Content>(response.Payload, sessionKey);
 
             var satisfyingVouchers = _vouchers.Where(v => {
@@ -150,6 +148,9 @@ namespace WomPlatform.Connector {
 
             var sessionKey = _client.Crypto.GenerateSessionKey();
 
+            _client.Logger.LogDebug(LoggingEvents.Pocket,
+                "Performing payment confirmation request");
+
             var response = await _client.PerformOperation<PaymentConfirmResponse>("v1/payment/confirm", new PaymentConfirmPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentConfirmPayload.Content {
                     Otc = otc,
@@ -162,10 +163,6 @@ namespace WomPlatform.Connector {
                                 }).ToArray()
                 }, await _client.GetRegistryPublicKey())
             });
-
-            _client.Logger.LogDebug(LoggingEvents.Pocket,
-                "Performing payment confirmation request");
-
             var paymentConfirmation = _client.Crypto.Decrypt<PaymentConfirmResponse.Content>(response.Payload, sessionKey);
 
             return paymentConfirmation.AckUrl;
