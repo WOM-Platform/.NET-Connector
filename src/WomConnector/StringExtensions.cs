@@ -10,6 +10,10 @@ namespace WomPlatform.Connector {
             return Convert.ToBase64String(b, Base64FormattingOptions.None);
         }
 
+        public static string ToBase64(this string s) {
+            return Convert.ToBase64String(s.ToBytes(), Base64FormattingOptions.None);
+        }
+
         public static byte[] FromBase64(this string s) {
             return Convert.FromBase64String(s);
         }

@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using RestSharp;
+using WomPlatform.Connector.Models;
 
 namespace WomPlatform.Connector {
 
@@ -252,6 +253,29 @@ namespace WomPlatform.Connector {
         public async Task<string> FetchRegistryPublicKey() {
             var response = await PerformRequest(HttpsClient, new RestRequest("v1/auth/key", Method.GET));
             return response.Content;
+        }
+
+        /// <summary>
+        /// Login as a merchant and retrieve list of POS.
+        /// </summary>
+        public async Task<MerchantLoginResultV2> LoginAsMerchant(string username, string password) {
+            var request = new RestRequest("v2/auth/merchant", Method.POST);
+            request.AddHeader("Authorization",
+                string.Format("Basic {0}", $"{username}:{password}".ToBase64())
+            );
+            var response = await PerformRequest(HttpsClient, request);
+
+            return JsonConvert.DeserializeObject<MerchantLoginResultV2>(response.Content);
+        }
+
+        /// <summary>
+        /// Fetch list of aims.
+        /// </summary>
+        public async Task<AimListResponseV2> GetAims() {
+            var request = new RestRequest("v2/aims", Method.GET);
+            var response = await PerformRequest(HttpsClient, request);
+
+            return JsonConvert.DeserializeObject<AimListResponseV2>(response.Content);
         }
 
         /// <summary>

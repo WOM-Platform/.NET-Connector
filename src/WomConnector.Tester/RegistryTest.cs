@@ -46,6 +46,23 @@ namespace WomConnector.Tester {
             Assert.IsNotNull(await _client.GetRegistryPublicKey());
         }
 
+        [Test]
+        public async Task TestMerchantLogin() {
+            var response = await _client.LoginAsMerchant("dummy@example.org", "password");
+
+            Assert.AreEqual("dummy@example.org", response.Email);
+            Assert.AreEqual("Dummy", response.Name);
+            Assert.AreEqual(0, response.Merchants.Count);
+        }
+
+        [Test]
+        public async Task TestAimList() {
+            var response = await _client.GetAims();
+
+            Console.WriteLine("{0} aims retrieved", response.Aims.Count);
+            Assert.Greater(response.Aims.Count, 0);
+        }
+
     }
 
 }
