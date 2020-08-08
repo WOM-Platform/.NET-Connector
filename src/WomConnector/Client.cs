@@ -269,6 +269,19 @@ namespace WomPlatform.Connector {
         }
 
         /// <summary>
+        /// Login as a merchant and retrieve list of POS.
+        /// </summary>
+        public async Task<MerchantLoginResultV2> LoginAsSource(string username, string password) {
+            var request = new RestRequest("v1/auth/sources", Method.GET);
+            request.AddHeader("Authorization",
+                string.Format("Basic {0}", $"{username}:{password}".ToBase64())
+            );
+            var response = await PerformRequest(HttpsClient, request);
+
+            return JsonConvert.DeserializeObject<MerchantLoginResultV2>(response.Content);
+        }
+
+        /// <summary>
         /// Fetch list of aims.
         /// </summary>
         public async Task<AimListResponseV2> GetAims() {
