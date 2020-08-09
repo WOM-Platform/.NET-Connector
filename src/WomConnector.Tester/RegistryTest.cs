@@ -57,11 +57,9 @@ namespace WomConnector.Tester {
 
         [Test]
         public async Task TestSourceLogin() {
-            var response = await _client.LoginAsMerchant("dummy@example.org", "password");
+            var response = await _client.LoginAsSource("dummy@example.org", "password");
 
-            Assert.AreEqual("dummy@example.org", response.Email);
-            Assert.AreEqual("Dummy", response.Name);
-            Assert.AreEqual(0, response.Merchants.Count);
+            Assert.AreEqual(0, response.Sources.Count);
         }
 
         [Test]
