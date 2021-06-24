@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 namespace WomPlatform.Connector.Models {
 
     /// <summary>
-    /// Input payload for payment information query.
+    /// Input payload for payment information query performed by Pocket.
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
     public class PaymentInfoPayload {

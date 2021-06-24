@@ -23,6 +23,16 @@ namespace WomPlatform.Connector {
             }
         }
 
+        /// <summary>
+        /// Create a new payment request.
+        /// </summary>
+        /// <param name="amount">Amount of vouchers that are required to confirm the payment.</param>
+        /// <param name="pocketAckUrl">Confirmation URL invoked by the Pocket.</param>
+        /// <param name="posAckUrl">Confirmation URL used by the Registry.</param>
+        /// <param name="filter">Filter used to determine which vouchers satisfy the payment.</param>
+        /// <param name="isPersistent"></param>
+        /// <param name="nonce">Unique nonce of the payment request, is auto-generated if null.</param>
+        /// <param name="password">User password required to confirm the payment, is auto-generated if null.</param>
         public async Task<PaymentRequest> RequestPayment(int amount,
             string pocketAckUrl, string posAckUrl = null,
             SimpleFilter filter = null, bool isPersistent = false,
@@ -40,7 +50,7 @@ namespace WomPlatform.Connector {
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            _client.Logger.LogDebug(LoggingEvents.Instrument,
+            _client.Logger.LogDebug(LoggingEvents.PointOfSale,
                 "Performing payment creation request");
 
             var response = await _client.PerformOperation<PaymentRegisterResponse>("v1/payment/register", new PaymentRegisterPayload {
@@ -58,8 +68,7 @@ namespace WomPlatform.Connector {
             });
             var responseContent = _client.Crypto.Decrypt<PaymentRegisterResponse.Content>(response.Payload, _privateKey);
 
-            _client.Logger.LogDebug(LoggingEvents.Instrument,
-                "Performing payment verification request");
+            _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Performing payment verification request");
 
             await _client.PerformOperation("v1/payment/verify", new PaymentVerifyPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentVerifyPayload.Content {
@@ -67,8 +76,7 @@ namespace WomPlatform.Connector {
                 }, await _client.GetRegistryPublicKey())
             });
 
-            _client.Logger.LogDebug(LoggingEvents.Instrument,
-                "Voucher creation succeeded");
+            _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Voucher creation succeeded");
 
             return new PaymentRequest(_client, responseContent.Otc, responseContent.Password);
         }
