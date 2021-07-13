@@ -45,6 +45,12 @@ namespace WomPlatform.Connector.Models {
             [JsonProperty("password", Required = Required.Always)]
             public string Password { get; set; }
 
+            /// <summary>
+            /// Payment link for clients.
+            /// </summary>
+            [JsonProperty("link", Required = Required.DisallowNull)]
+            public string Link { get; set; }
+
         }
 
     }
