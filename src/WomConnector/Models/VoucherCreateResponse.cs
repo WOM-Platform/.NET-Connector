@@ -51,6 +51,12 @@ namespace WomPlatform.Connector.Models {
             [JsonProperty("link", Required = Required.DisallowNull)]
             public string Link { get; set; }
 
+            /// <summary>
+            /// Voucher count.
+            /// </summary>
+            [JsonProperty("count", Required = Required.Default)]
+            public int Count { get; set; }
+
         }
 
     }
