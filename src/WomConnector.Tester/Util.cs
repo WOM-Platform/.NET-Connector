@@ -43,12 +43,7 @@ namespace WomConnector.Tester {
         }
 
         public static Client CreateClient() {
-            AsymmetricKeyParameter pubKey = null;
-            using(var fs = new FileStream("keys/registry.pub", FileMode.Open)) {
-                pubKey = KeyUtil.LoadKeyParameterFromPem(fs);
-            }
-
-            return new Client("dev.wom.social", new LoggerFactory(), pubKey);
+            return new Client("dev.wom.social", new LoggerFactory());
         }
 
         private static Client _client = null;

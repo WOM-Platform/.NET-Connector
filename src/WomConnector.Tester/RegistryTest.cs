@@ -48,16 +48,17 @@ namespace WomConnector.Tester {
 
         [Test]
         public async Task TestMerchantLogin() {
-            var response = await _client.LoginAsMerchant("dummy@example.org", "password");
+            var response = await _client.LoginAsMerchant("dummy@example.org", "NfBTFsXsYpCyJeV1yUcx");
 
             Assert.AreEqual("dummy@example.org", response.Email);
             Assert.AreEqual("Dummy", response.Name);
-            Assert.AreEqual(0, response.Merchants.Count);
+            Assert.GreaterOrEqual(1, response.Merchants.Count);
+            Assert.GreaterOrEqual(1, response.Merchants[0].Pos.Count);
         }
 
         [Test]
         public async Task TestSourceLogin() {
-            var response = await _client.LoginAsSource("dummy@example.org", "password");
+            var response = await _client.LoginAsSource("dummy@example.org", "NfBTFsXsYpCyJeV1yUcx");
 
             Assert.AreEqual(0, response.Sources.Count);
         }
