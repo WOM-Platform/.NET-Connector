@@ -20,9 +20,6 @@
     <None Update="keys\pos1.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="keys\registry.pub">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="keys\source1.pem">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
