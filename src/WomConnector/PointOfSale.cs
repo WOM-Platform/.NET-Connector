@@ -81,6 +81,22 @@ namespace WomPlatform.Connector {
             return new PaymentRequest(_client, responseContent.Otc, responseContent.Password);
         }
 
+        /// <summary>
+        /// Retrieve information about a payment requested by the POS.
+        /// </summary>
+        /// <param name="otcPay">OTC of the payment.</param>
+        public async Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
+            _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Retrieving payment information");
+
+            var response = await _client.PerformOperation<PaymentStatusResponse>("v2/payment/status", new PaymentStatusPayload {
+                Payload = _client.Crypto.Encrypt(new PaymentStatusPayload.Content {
+                    PosId = _id,
+                    Otc = otcPay
+                }, await _client.GetRegistryPublicKey())
+            });
+            return _client.Crypto.Decrypt<PaymentStatusResponse.Content>(response.Payload, _privateKey);
+        }
+
     }
 
 }
