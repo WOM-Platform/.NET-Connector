@@ -251,7 +251,7 @@ namespace WomPlatform.Connector {
         /// Loads the registry's public key from the server.
         /// </summary>
         public async Task<string> FetchRegistryPublicKey() {
-            var response = await PerformRequest(HttpsClient, new RestRequest("v1/auth/key", Method.GET));
+            var response = await PerformRequest(HttpsClient, new RestRequest("v2/auth/key", Method.GET));
             return response.Content;
         }
 
