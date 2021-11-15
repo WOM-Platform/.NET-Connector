@@ -21,6 +21,15 @@ namespace WomPlatform.Connector {
             }
         }
 
+        /// <summary>
+        /// Retrieves the instrument's identifier.
+        /// </summary>
+        public Identifier Identifier {
+            get {
+                return _id;
+            }
+        }
+
         public async Task<VoucherRequest> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers,
             string nonce = null, string password = null) {
 

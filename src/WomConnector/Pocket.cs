@@ -41,6 +41,22 @@ namespace WomPlatform.Connector {
         }
 
         /// <summary>
+        /// Adds existing vouchers to the pocket.
+        /// </summary>
+        /// <param name="vouchers">Enumeration of existing vouchers.</param>
+        /// <returns>True if all vouchers were added, false if a collision was detected.</returns>
+        public bool AddVouchers(IEnumerable<Voucher> vouchers) {
+            bool ok = true;
+            foreach(var v in vouchers) {
+                if(!_vouchers.Add(v)) {
+                    ok = false;
+                }
+            }
+
+            return ok;
+        }
+
+        /// <summary>
         /// Collect vouchers from a given voucher generation request.
         /// </summary>
         /// <param name="otc">One-time code of the generation request.</param>

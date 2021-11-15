@@ -24,6 +24,15 @@ namespace WomPlatform.Connector {
         }
 
         /// <summary>
+        /// Retrieves the POS identifier.
+        /// </summary>
+        public Identifier Identifier {
+            get {
+                return _id;
+            }
+        }
+
+        /// <summary>
         /// Create a new payment request.
         /// </summary>
         /// <param name="amount">Amount of vouchers that are required to confirm the payment.</param>
