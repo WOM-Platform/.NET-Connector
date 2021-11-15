@@ -61,20 +61,29 @@ namespace WomPlatform.Connector {
         /// </summary>
         /// <param name="otc">One-time code of the generation request.</param>
         /// <param name="password">Password of the generation request.</param>
-        public async Task CollectVouchers(Guid otc, string password) {
+        /// <param name="redeemLocation">Optional user location.</param>
+        public async Task CollectVouchers(
+            Guid otc,
+            string password,
+            GeoCoords? redeemLocation = null
+        ) {
             _client.Logger.LogInformation(LoggingEvents.Pocket,
                 "Acquiring vouchers from request {0}", otc);
 
             var sessionKey = _client.Crypto.GenerateSessionKey();
 
             _client.Logger.LogDebug(LoggingEvents.Pocket,
-                "Performing voucher redeem request");
+                "Performing voucher redeem request {0} user location",
+                redeemLocation.HasValue ? "with" : "without");
 
             var response = await _client.PerformOperation<VoucherRedeemResponse>("v1/voucher/redeem", new VoucherRedeemPayload {
                 Payload = _client.Crypto.Encrypt(new VoucherRedeemPayload.Content {
                     Otc = otc,
                     Password = password,
-                    SessionKey = sessionKey.ToBase64()
+                    SessionKey = sessionKey.ToBase64(),
+                    RedeemLocation = redeemLocation.HasValue ?
+                        new Location { Latitude = redeemLocation.Value.Latitude, Longitude = redeemLocation.Value.Longitude } :
+                        null
                 }, await _client.GetRegistryPublicKey())
             });
             var responseContent = _client.Crypto.Decrypt<VoucherRedeemResponse.Content>(response.Payload, sessionKey);

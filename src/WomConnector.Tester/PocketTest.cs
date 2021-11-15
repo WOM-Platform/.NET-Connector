@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using WomPlatform.Connector;
 using WomPlatform.Connector.Models;
 
 namespace WomConnector.Tester {

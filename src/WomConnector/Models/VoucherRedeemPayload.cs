@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace WomPlatform.Connector.Models {
@@ -29,6 +30,13 @@ namespace WomPlatform.Connector.Models {
             /// </summary>
             [JsonProperty("sessionKey", Required = Required.Always)]
             public string SessionKey { get; set; }
+
+            /// <summary>
+            /// Optional location of the user when redeeming vouchers.
+            /// </summary>
+            [DefaultValue(null)]
+            [JsonProperty("redeemLocation", Required = Required.Default, DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+            public Location RedeemLocation { get; set; }
 
         }
 

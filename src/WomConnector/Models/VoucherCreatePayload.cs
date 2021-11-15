@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace WomPlatform.Connector.Models {
 
@@ -84,6 +85,19 @@ namespace WomPlatform.Connector.Models {
             [JsonProperty("count", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
             public int Count { get; set; } = 1;
 
+            [DefaultValue(VoucherCreationMode.Standard)]
+            [JsonProperty("creationMode", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
+            [JsonConverter(typeof(StringEnumConverter))]
+            public VoucherCreationMode CreationMode { get; set; } = VoucherCreationMode.Standard;
+
+        }
+
+        /// <summary>
+        /// Determines the mode of voucher creation.
+        /// </summary>
+        public enum VoucherCreationMode {
+            Standard,
+            SetLocationOnRedeem
         }
 
     }
