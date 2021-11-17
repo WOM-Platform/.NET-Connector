@@ -72,10 +72,10 @@ namespace WomPlatform.Connector.Models {
             [JsonProperty("aim", Required = Required.Always)]
             public string Aim { get; set; }
 
-            [JsonProperty("latitude", Required = Required.Always)]
+            [JsonProperty("latitude", Required = Required.Default)]
             public double Latitude { get; set; }
 
-            [JsonProperty("longitude", Required = Required.Always)]
+            [JsonProperty("longitude", Required = Required.Default)]
             public double Longitude { get; set; }
 
             [JsonProperty("timestamp", Required = Required.Always)]
