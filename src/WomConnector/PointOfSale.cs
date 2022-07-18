@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Crypto;
@@ -54,13 +52,11 @@ namespace WomPlatform.Connector {
                 throw new ArgumentNullException(nameof(pocketAckUrl));
             }
 
-            _client.Logger.LogInformation(LoggingEvents.PointOfSale,
-                "Creating payment request for {0} vouchers", amount);
+            _client.Logger.LogInformation(LoggingEvents.PointOfSale, "Creating payment request for {0} vouchers", amount);
 
             var effectiveNonce = nonce ?? Guid.NewGuid().ToString("N");
 
-            _client.Logger.LogDebug(LoggingEvents.PointOfSale,
-                "Performing payment creation request");
+            _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Performing payment creation request");
 
             var response = await _client.PerformOperation<PaymentRegisterResponse>("v1/payment/register", new PaymentRegisterPayload {
                 PosId = _id,
@@ -94,10 +90,20 @@ namespace WomPlatform.Connector {
         /// Retrieve information about a payment requested by the POS.
         /// </summary>
         /// <param name="otcPay">OTC of the payment.</param>
-        public async Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
-            _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Retrieving payment information");
+        [Obsolete]
+        public Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
+            return GetPaymentStatus(otcPay);
+        }
+
+        /// <summary>
+        /// Retrieve information about a payment requested by the POS.
+        /// </summary>
+        /// <param name="otcPay">OTC of the payment.</param>
+        public async Task<PaymentStatusResponse.Content> GetPaymentStatus(Guid otcPay) {
+            _client.Logger.LogInformation(LoggingEvents.PointOfSale, "Retrieving status of payment {0}", otcPay);
 
             var response = await _client.PerformOperation<PaymentStatusResponse>("v1/payment/status", new PaymentStatusPayload {
+                PosId = _id,
                 Payload = _client.Crypto.Encrypt(new PaymentStatusPayload.Content {
                     PosId = _id,
                     Otc = otcPay
