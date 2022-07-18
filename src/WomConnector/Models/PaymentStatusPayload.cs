@@ -10,6 +10,13 @@ namespace WomPlatform.Connector.Models {
     public class PaymentStatusPayload {
 
         /// <summary>
+        /// Unique ID of the POS.
+        /// </summary>
+        [JsonProperty("posId", Required = Required.Always)]
+        [JsonConverter(typeof(IdentifierConverter))]
+        public Identifier PosId { get; set; }
+
+        /// <summary>
         /// Encrypted payload (instance of <see cref="Content" />).
         /// </summary>
         [JsonProperty("payload", Required = Required.Always)]

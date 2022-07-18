@@ -12,23 +12,23 @@ namespace WomPlatform.Connector.Models {
     public class PaymentStatusResponse {
 
         /// <summary>
+        /// Unique ID of the POS.
+        /// </summary>
+        [JsonProperty("posId", Required = Required.Always)]
+        [JsonConverter(typeof(IdentifierConverter))]
+        public Identifier PosId { get; set; }
+
+        /// <summary>
         /// Encrypted payload (instance of <see cref="Content" />).
         /// </summary>
         [JsonProperty("payload", Required = Required.Always)]
         public string Payload { get; set; }
 
         /// <summary>
-        /// Payload encrypted with session key.
+        /// Payload encrypted with POS public key.
         /// </summary>
         [JsonObject(MemberSerialization.OptIn)]
         public class Content {
-
-            /// <summary>
-            /// Unique ID of the POS.
-            /// </summary>
-            [JsonProperty("posId", Required = Required.Always)]
-            [JsonConverter(typeof(IdentifierConverter))]
-            public Identifier PosId { get; set; }
 
             /// <summary>
             /// Gets whether the payment is persistent.
@@ -36,6 +36,9 @@ namespace WomPlatform.Connector.Models {
             [DefaultValue(false)]
             [JsonProperty("persistent", DefaultValueHandling = DefaultValueHandling.IgnoreAndPopulate)]
             public bool Persistent { get; set; } = false;
+
+            [JsonProperty("hasBeenPerformed")]
+            public bool HasBeenPerformed { get; set; };
 
             [JsonProperty("confirmations")]
             public List<Confirmation> Confirmations { get; set; }
