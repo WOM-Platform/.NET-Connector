@@ -64,9 +64,9 @@ namespace WomPlatform.Connector.Models {
             public SimpleFilter SimpleFilter { get; set; }
 
             /// <summary>
-            /// Required URL for the acknowledgment to the Pocket.
+            /// Optional URL for the acknowledgment to the Pocket.
             /// </summary>
-            [JsonProperty("pocketAckUrl", Required = Required.Always)]
+            [JsonProperty("pocketAckUrl")]
             public string PocketAckUrl { get; set; }
 
             /// <summary>

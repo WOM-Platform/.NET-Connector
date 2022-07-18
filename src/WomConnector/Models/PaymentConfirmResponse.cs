@@ -20,7 +20,7 @@ namespace WomPlatform.Connector.Models {
         public class Content {
 
             /// <summary>
-            /// Acknowledgment URL that may be used by Pocket.
+            /// Acknowledgment URL that may be shown by Pocket.
             /// </summary>
             [JsonProperty("ackUrl", Required = Required.Always)]
             public string AckUrl { get; set; }
