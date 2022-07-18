@@ -97,7 +97,7 @@ namespace WomPlatform.Connector {
         public async Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
             _client.Logger.LogDebug(LoggingEvents.PointOfSale, "Retrieving payment information");
 
-            var response = await _client.PerformOperation<PaymentStatusResponse>("v2/payment/status", new PaymentStatusPayload {
+            var response = await _client.PerformOperation<PaymentStatusResponse>("v1/payment/status", new PaymentStatusPayload {
                 Payload = _client.Crypto.Encrypt(new PaymentStatusPayload.Content {
                     PosId = _id,
                     Otc = otcPay
