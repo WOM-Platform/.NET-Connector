@@ -175,6 +175,52 @@ namespace WomConnector.Tester {
             Assert.AreEqual(4, pocket.VoucherCount);
         }
 
+        [Test]
+        public async Task CheckPaymentInformation() {
+            var pos = Util.GeneratePos();
+
+            var request = await pos.RequestPayment(
+                amount: 10,
+                pocketAckUrl: "https://example.org",
+                filter: new SimpleFilter {
+                    Aim = "H"
+                }
+            );
+
+            var info = await pos.GetPaymentInformation(request.OtcPay);
+            Assert.AreEqual(pos.Identifier, info.PosId);
+            Assert.AreEqual(0, info.Confirmations.Count);
+
+            var pocket = Util.CreatePocket();
+
+            var instrument = Util.GenerateInstrument();
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                new VoucherCreatePayload.VoucherInfo {
+                    Aim = "E",
+                    Count = 5,
+                    Latitude = 43.72621,
+                    Longitude = 12.63633,
+                    Timestamp = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30))
+                },
+                new VoucherCreatePayload.VoucherInfo {
+                    Aim = "H",
+                    Count = 10,
+                    Latitude = 41.72621,
+                    Longitude = 15.63633,
+                    Timestamp = DateTime.UtcNow.Subtract(TimeSpan.FromDays(10))
+                }
+            });
+
+            await pocket.CollectVouchers(response.OtcGen, response.Password);
+
+            var paymentAckUrl = await pocket.PayWithRandomVouchers(response.OtcGen, response.Password);
+            Assert.AreEqual("https://example.org", paymentAckUrl);
+
+            info = await pos.GetPaymentInformation(request.OtcPay);
+            Assert.AreEqual(pos.Identifier, info.PosId);
+            Assert.GreaterOrEqual(1, info.Confirmations.Count);
+        }
+
     }
 
 }
