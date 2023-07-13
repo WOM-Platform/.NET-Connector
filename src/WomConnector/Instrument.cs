@@ -30,6 +30,14 @@ namespace WomPlatform.Connector {
             }
         }
 
+        public Task<VoucherRequest> RequestVouchers(VoucherCreatePayload.VoucherInfo vouchers,
+            string nonce = null, string password = null) {
+
+            return RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                vouchers
+            }, nonce, password);
+        }
+
         public async Task<VoucherRequest> RequestVouchers(VoucherCreatePayload.VoucherInfo[] vouchers,
             string nonce = null, string password = null) {
 
