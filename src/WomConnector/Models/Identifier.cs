@@ -29,6 +29,10 @@ namespace WomPlatform.Connector.Models {
         public static implicit operator Identifier(long id) => new Identifier(id);
 
         public override bool Equals(object obj) {
+            if(obj is Identifier idObj) {
+                return Id.Equals(idObj.Id);
+            }
+
             return Id.Equals(obj);
         }
 

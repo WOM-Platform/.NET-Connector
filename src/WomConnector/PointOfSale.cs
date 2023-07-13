@@ -91,15 +91,15 @@ namespace WomPlatform.Connector {
         /// </summary>
         /// <param name="otcPay">OTC of the payment.</param>
         [Obsolete]
-        public Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
-            return GetPaymentStatus(otcPay);
+        public async Task<PaymentStatusResponse.Content> GetPaymentInformation(Guid otcPay) {
+            return (await GetPaymentStatus(otcPay)).Response;
         }
 
         /// <summary>
         /// Retrieve information about a payment requested by the POS.
         /// </summary>
         /// <param name="otcPay">OTC of the payment.</param>
-        public async Task<PaymentStatusResponse.Content> GetPaymentStatus(Guid otcPay) {
+        public async Task<(Identifier PosId, PaymentStatusResponse.Content Response)> GetPaymentStatus(Guid otcPay) {
             _client.Logger.LogInformation(LoggingEvents.PointOfSale, "Retrieving status of payment {0}", otcPay);
 
             var response = await _client.PerformOperation<PaymentStatusResponse>("v1/payment/status", new PaymentStatusPayload {
@@ -109,7 +109,10 @@ namespace WomPlatform.Connector {
                     Otc = otcPay
                 }, await _client.GetRegistryPublicKey())
             });
-            return _client.Crypto.Decrypt<PaymentStatusResponse.Content>(response.Payload, _privateKey);
+
+            var responseContent = _client.Crypto.Decrypt<PaymentStatusResponse.Content>(response.Payload, _privateKey);
+
+            return (response.PosId, responseContent);
         }
 
     }

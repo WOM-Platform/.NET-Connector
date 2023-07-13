@@ -187,9 +187,9 @@ namespace WomConnector.Tester {
                 }
             );
 
-            var info = await pos.GetPaymentInformation(request.OtcPay);
+            var info = await pos.GetPaymentStatus(request.OtcPay);
             Assert.AreEqual(pos.Identifier, info.PosId);
-            Assert.AreEqual(0, info.Confirmations.Count);
+            Assert.AreEqual(0, info.Response.Confirmations.Count);
 
             var pocket = Util.CreatePocket();
 
@@ -213,12 +213,12 @@ namespace WomConnector.Tester {
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
 
-            var paymentAckUrl = await pocket.PayWithRandomVouchers(response.OtcGen, response.Password);
+            var paymentAckUrl = await pocket.PayWithRandomVouchers(request.OtcPay, request.Password);
             Assert.AreEqual("https://example.org", paymentAckUrl);
 
-            info = await pos.GetPaymentInformation(request.OtcPay);
+            info = await pos.GetPaymentStatus(request.OtcPay);
             Assert.AreEqual(pos.Identifier, info.PosId);
-            Assert.GreaterOrEqual(1, info.Confirmations.Count);
+            Assert.GreaterOrEqual(1, info.Response.Confirmations.Count);
         }
 
     }
