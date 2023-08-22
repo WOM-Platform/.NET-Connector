@@ -11,14 +11,16 @@ namespace WomPlatform.Connector {
         private readonly Client _client;
         private readonly Identifier _id;
         private readonly AsymmetricKeyParameter _privateKey;
+        private readonly string _apiKey;
 
-        internal Instrument(Client c, Identifier id, AsymmetricKeyParameter privateKey) {
+        internal Instrument(Client c, Identifier id, AsymmetricKeyParameter privateKey, string apiKey = null) {
             _client = c;
             _id = id;
             _privateKey = privateKey ?? throw new ArgumentNullException(nameof(privateKey));
             if(!_privateKey.IsPrivate) {
                 throw new ArgumentException("Key must be private", nameof(privateKey));
             }
+            _apiKey = apiKey;
         }
 
         /// <summary>
@@ -62,7 +64,7 @@ namespace WomPlatform.Connector {
                     Password = password,
                     Vouchers = vouchers
                 }, await _client.GetRegistryPublicKey())
-            });
+            }, _apiKey);
             var responseContent = _client.Crypto.Decrypt<VoucherCreateResponse.Content>(response.Payload, _privateKey);
 
             _client.Logger.LogDebug(LoggingEvents.Instrument,
@@ -79,7 +81,6 @@ namespace WomPlatform.Connector {
 
             return new VoucherRequest(_client, responseContent.Otc, responseContent.Password);
         }
-
     }
 
 }

@@ -10,6 +10,22 @@ namespace WomConnector.Tester {
     public class SetLocationOnRedeemTest {
 
         [Test]
+        public async Task CreateVouchersWithoutLocation() {
+            var instrument = Util.GenerateInstrument();
+            var response = await instrument.RequestVouchers(new VoucherCreatePayload.VoucherInfo[] {
+                new VoucherCreatePayload.VoucherInfo {
+                    Aim = "H",
+                    Count = 10,
+                    Timestamp = DateTime.UtcNow,
+                    CreationMode = VoucherCreatePayload.VoucherCreationMode.SetLocationOnRedeem
+                }
+            });
+
+            Console.WriteLine("Voucher link: {0}", response.Link);
+            Console.WriteLine("Password: {0}", response.Password);
+        }
+
+            [Test]
         public async Task SimpleSetLocationOnRedeemTest() {
             var pocket = Util.CreatePocket();
 

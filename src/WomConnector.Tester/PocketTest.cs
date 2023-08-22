@@ -30,6 +30,30 @@ namespace WomConnector.Tester {
             Assert.AreEqual(10, pocket.VoucherCount);
         }
 
+        [Test]
+        public async Task SpendOldLegacyVoucher() {
+            var pocket = Util.CreatePocket();
+            pocket.AddVouchers(new Voucher[] {
+                new Voucher(
+                    new Identifier(17),
+                    "nKCK1AMm4ruDp/c9EZhOjw==",
+                    "C",
+                    43.7244397,
+                    12.6397422,
+                    new DateTime(2019, 07, 18)
+                )
+            });
+
+            var pos = Util.GeneratePos();
+            var payment = await pos.RequestPayment(1, "https://example.org", null, new SimpleFilter {
+                Aim = "C"
+            });
+
+            var pocketAck = await pocket.PayWithRandomVouchers(payment.OtcPay, payment.Password);
+
+            Assert.AreEqual("https://example.org", pocketAck);
+        }
+
     }
 
 }

@@ -1,17 +1,17 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace WomPlatform.Connector.Models {
     /// <summary>
     /// Encapsulates information about a location.
     /// </summary>
-    [JsonObject(MemberSerialization.OptIn)]
     public class Location {
 
-        [JsonProperty("latitude", Required = Required.Always)]
+        [JsonRequired]
+        [JsonPropertyName("latitude")]
         public double Latitude { get; set; }
 
-        [JsonProperty("longitude", Required = Required.Always)]
+        [JsonRequired]
+        [JsonPropertyName("longitude")]
         public double Longitude { get; set; }
 
     }

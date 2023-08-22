@@ -9,6 +9,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.OpenSsl;
 using RestSharp;
 using WomPlatform.Connector.Models;
+using WomPlatform.Connector.Models.RegistryResponses;
 
 namespace WomPlatform.Connector {
 
@@ -191,11 +192,14 @@ namespace WomPlatform.Connector {
             }
         }
 
-        internal protected async Task<IRestResponse> PerformOperation(string urlPath, object jsonBody) {
+        internal protected async Task<IRestResponse> PerformOperation(string urlPath, object jsonBody, string apiKey = null) {
             var request = new RestRequest(urlPath, Method.POST) {
                 RequestFormat = DataFormat.Json
             };
             request.AddHeader("Accept", "application/json");
+            if(apiKey != null) {
+                request.AddHeader("X-WOM-ApiKey", apiKey);
+            }
             if(jsonBody != null) {
                 request.AddJsonBody(jsonBody);
             }
@@ -207,8 +211,8 @@ namespace WomPlatform.Connector {
         /// Performs a Registry operation, as a POST request with JSON body
         /// and expecting a JSON response.
         /// </summary>
-        internal protected async Task<T> PerformOperation<T>(string urlPath, object jsonBody) {
-            var response = await PerformOperation(urlPath, jsonBody);
+        internal protected async Task<T> PerformOperation<T>(string urlPath, object jsonBody, string apiKey = null) {
+            var response = await PerformOperation(urlPath, jsonBody, apiKey);
 
             return JsonConvert.DeserializeObject<T>(response.Content);
         }
@@ -282,6 +286,29 @@ namespace WomPlatform.Connector {
         }
 
         /// <summary>
+        /// Creates an API key for this Instrument.
+        /// </summary>
+        /// <param name="keySelector">Key selector string used to uniquely identify this API key within the Instrument.</param>
+        public async Task<string> CreateSourceApiKey(Identifier sourceId, string username, string password,
+            string keySelector, KindOfApiKey kind = KindOfApiKey.SourceAdministrator) {
+
+            if(string.IsNullOrEmpty(keySelector)) {
+                throw new ArgumentNullException(nameof(keySelector));
+            }
+
+            Logger.LogInformation("Creating instrument API key for selector {0} and role {1}", keySelector, kind);
+
+            var request = new RestRequest($"v2/auth/source/{sourceId}/apikey?selector={keySelector}&kind={kind}", Method.POST);
+            request.AddHeader("Authorization",
+                string.Format("Basic {0}", $"{username}:{password}".ToBase64())
+            );
+            var response = await PerformRequest(HttpsClient, request);
+
+            var data = JsonConvert.DeserializeObject<CreateApiKeySourceResponse>(response.Content);
+            return data.ApiKey;
+        }
+
+        /// <summary>
         /// Fetch list of aims.
         /// </summary>
         public async Task<AimListResponseV2> GetAims() {
@@ -322,6 +349,23 @@ namespace WomPlatform.Connector {
             }
 
             return new Instrument(this, id, pair.Private);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Instrument"/> instance using an user-bound API key.
+        /// </summary>
+        public async Task<Instrument> CreateInstrument(string id, string username, string password, string apiKeySelector) {
+            var apiKey = await CreateSourceApiKey(id, username, password, apiKeySelector);
+
+            var request = new RestRequest($"v2/auth/apikey", Method.POST);
+            request.AddHeader("X-WOM-ApiKey", apiKey);
+            var response = await PerformRequest(HttpsClient, request);
+
+            var apiKeyData = JsonConvert.DeserializeObject<GetApiKeyCredentialsResponse>(response.Content);
+
+            var keyPair = LoadFromPem<AsymmetricCipherKeyPair>(apiKeyData.PrivateKey);
+
+            return new Instrument(this, id, keyPair.Private, apiKey);
         }
 
         /// <summary>

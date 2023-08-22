@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace WomPlatform.Connector.Models {
+namespace WomPlatform.Connector.Models.RegistryResponses {
 
     public class AimListResponseV2 {
 
-        public List<Aim> Aims { get; set; }
+        public Aim[] Aims { get; set; }
 
         public class Aim {
 

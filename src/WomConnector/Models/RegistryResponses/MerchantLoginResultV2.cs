@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace WomPlatform.Connector.Models.RegistryResponses {
 
-namespace WomPlatform.Connector.Models {
-
-    public class MerchantLoginResultV2 {
+    public class MerchantLoginResponseV2 {
 
         public string Name { get; set; }
 
@@ -10,7 +8,7 @@ namespace WomPlatform.Connector.Models {
 
         public string Email { get; set; }
 
-        public List<Merchant> Merchants { get; set; }
+        public Merchant[] Merchants { get; set; }
 
         public class Merchant {
 
@@ -28,7 +26,7 @@ namespace WomPlatform.Connector.Models {
 
             public string Country { get; set; }
 
-            public List<Pos> Pos { get; set; }
+            public Pos[] Pos { get; set; }
 
         }
 

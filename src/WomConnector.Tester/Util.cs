@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Crypto;
 using WomPlatform.Connector;
+using WomPlatform.Connector.Models;
 
 namespace WomConnector.Tester {
 
@@ -42,6 +41,15 @@ namespace WomConnector.Tester {
 
         }
 
+        public static readonly string Instrument1Id = "5e74203f5f21bb265a2d26bd";
+        public static readonly Identifier Instrument1Identifier = new Identifier(Instrument1Id);
+
+        public static readonly string Pos1Id = "5e74205c5f21bb265a2d26d8";
+        public static readonly Identifier Pos1Identifier = new Identifier(Pos1Id);
+
+        public static readonly string AdminEmail = "admin@example.org";
+        public static readonly string AdminPassword = "password123!";
+
         public static Client CreateClient() {
             return new Client("dev.wom.social", new LoggerFactory());
         }
@@ -67,7 +75,7 @@ namespace WomConnector.Tester {
         }
 
         public static Instrument GenerateInstrument() {
-            return CreateInstrument("5e74203f5f21bb265a2d26bd", "keys/source1.pem");
+            return CreateInstrument(Instrument1Id, "keys/source1.pem");
         }
 
         public static Pocket CreatePocket() {
@@ -84,7 +92,7 @@ namespace WomConnector.Tester {
         }
 
         public static PointOfSale GeneratePos() {
-            return CreatePos("5e74205c5f21bb265a2d26d8", "keys/pos1.pem");
+            return CreatePos(Pos1Id, "keys/pos1.pem");
         }
 
     }

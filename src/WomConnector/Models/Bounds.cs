@@ -1,14 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace WomPlatform.Connector.Models {
 
-    [JsonObject(MemberSerialization.OptIn)]
     public class Bounds {
 
-        [JsonProperty("leftTop", Required = Required.Always)]
+        [JsonRequired]
+        [JsonPropertyName("leftTop")]
         public double[] LeftTop { get; set; }
 
-        [JsonProperty("rightBottom", Required = Required.Always)]
+        [JsonRequired]
+        [JsonPropertyName("rightBottom")]
         public double[] RightBottom { get; set; }
 
     }
