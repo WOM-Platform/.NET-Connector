@@ -11,7 +11,7 @@
     <Product />
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/WOM-Platform/.NET-Connector.git</RepositoryUrl>
-	<PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://wom.social</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
     <Description>WOM is general-purpose rewarding platform based on a voucher exchange system.
@@ -19,9 +19,10 @@ WOM stands for “Worth One Minute”: each WOM voucher rewards one minute of so
 
 This connector allows .NET projects of all kinds to act as a WOM Pocket, Instrument, Point of Sale, or to implement Registry functionalities.</Description>
     <PackageIcon>wom-logo-128.png</PackageIcon>
-	<IncludeSymbols>true</IncludeSymbols>
-	<EmbedUntrackedSources>true</EmbedUntrackedSources>
-	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,17 +30,15 @@ This connector allows .NET projects of all kinds to act as a WOM Pocket, Instrum
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="RestSharp" Version="106.15.0" />
-	<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-		<PrivateAssets>all</PrivateAssets>
-		<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\icon\wom-logo-128.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\icon\wom-logo-128.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

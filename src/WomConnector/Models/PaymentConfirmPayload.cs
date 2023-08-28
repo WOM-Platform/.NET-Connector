@@ -12,7 +12,7 @@ namespace WomPlatform.Connector.Models {
         /// <summary>
         /// Encrypted payload (instance of <see cref="Content" />).
         /// </summary>
-        [JsonProperty("payload")]
+        [JsonProperty("payload", Required = Required.Always)]
         public string Payload { get; set; }
 
         /// <summary>
