@@ -148,6 +148,24 @@ namespace WomPlatform.Connector {
             return _registryPublicKey;
         }
 
+        /// <summary>
+        /// Get the exchange source's public key.
+        /// </summary>
+        public async Task<AsymmetricKeyParameter> GetExchangeSourcePublicKey() {
+            var data = await FetchExchangeCredentials();
+            var publicKey = LoadFromPem<AsymmetricKeyParameter>(data.SourcePublicKey);
+            return publicKey;
+        }
+
+        /// <summary>
+        /// Get the anonymous pos' private key.
+        /// </summary>
+        public async Task<AsymmetricKeyParameter> GetAnonymousPosPrivateKey() {
+            var data = await FetchAnonymousCredentials();
+            var privateKey = LoadFromPem<AsymmetricKeyParameter>(data.PosPrivateKey);
+            return privateKey;
+        }
+
         internal protected ILogger<Client> Logger { get; }
 
         /// <summary>
@@ -253,6 +271,22 @@ namespace WomPlatform.Connector {
         public async Task<string> FetchRegistryPublicKey() {
             var response = await PerformRequest(HttpsClient, new RestRequest("v2/auth/key", Method.GET));
             return response.Content;
+        }
+
+        /// <summary>
+        /// Loads the anonymous pos' credentials.
+        /// </summary>
+        public async Task<GetPosCredentialsResponse> FetchAnonymousCredentials() {
+            var response = await PerformRequest(HttpsClient, new RestRequest("v2/auth/anonymous", Method.GET));
+            return JsonConvert.DeserializeObject<GetPosCredentialsResponse>(response.Content);
+        }
+
+        /// <summary>
+        /// Loads the exchange source's credentials.
+        /// </summary>
+        public async Task<GetSourceCredentialsResponse> FetchExchangeCredentials() {
+            var response = await PerformRequest(HttpsClient, new RestRequest("v2/auth/exchange", Method.GET));
+            return JsonConvert.DeserializeObject<GetSourceCredentialsResponse>(response.Content);
         }
 
         /// <summary>
