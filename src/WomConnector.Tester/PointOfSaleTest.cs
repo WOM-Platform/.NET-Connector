@@ -40,15 +40,15 @@ namespace WomConnector.Tester {
             });
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
-            Assert.AreEqual(1, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(1));
 
             var singleVoucher = pocket.Vouchers[0];
 
             var respPay1 = await _pos.RequestPayment(1, "https://example.org");
 
             string ackUrl = await pocket.PayWithRandomVouchers(respPay1.OtcPay, respPay1.Password);
-            Assert.AreEqual(0, pocket.VoucherCount);
-            Assert.AreEqual("https://example.org", ackUrl);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(0));
+            Assert.That(ackUrl, Is.EqualTo("https://example.org"));
 
             // Test double spending
             var respPay2 = await _pos.RequestPayment(1, "https://example.org");
@@ -82,7 +82,7 @@ namespace WomConnector.Tester {
             });
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
-            Assert.AreEqual(3, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(3));
 
             var pos = Util.GeneratePos();
             var responsePay = await pos.RequestPayment(2, "https://example.org",
@@ -92,9 +92,9 @@ namespace WomConnector.Tester {
             );
 
             string ackUrl = await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
-            Assert.AreEqual(1, pocket.VoucherCount);
-            Assert.AreEqual("https://example.org", ackUrl);
-            Assert.AreEqual("E", pocket.Vouchers[0].Aim);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(1));
+            Assert.That(ackUrl, Is.EqualTo("https://example.org"));
+            Assert.That(pocket.Vouchers[0].Aim, Is.EqualTo("E"));
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace WomConnector.Tester {
             });
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
-            Assert.AreEqual(3, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(3));
 
             var pos = Util.GeneratePos();
             var responsePay = await pos.RequestPayment(4, "https://example.org");
@@ -129,7 +129,7 @@ namespace WomConnector.Tester {
                 await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
             });
             
-            Assert.AreEqual(3, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(3));
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace WomConnector.Tester {
             });
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
-            Assert.AreEqual(4, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(4));
 
             var pos = Util.GeneratePos();
             var responsePay = await pos.RequestPayment(3, "https://example.org",
@@ -172,7 +172,7 @@ namespace WomConnector.Tester {
                 await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
             });
 
-            Assert.AreEqual(4, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(4));
         }
 
         [Test]
@@ -188,8 +188,8 @@ namespace WomConnector.Tester {
             );
 
             var info = await pos.GetPaymentStatus(request.OtcPay);
-            Assert.AreEqual(pos.Identifier, info.PosId);
-            Assert.AreEqual(0, info.Response.Confirmations.Count);
+            Assert.That(info.PosId, Is.EqualTo(pos.Identifier));
+            Assert.That(info.Response.Confirmations.Count, Is.EqualTo(0));
 
             var pocket = Util.CreatePocket();
 
@@ -214,11 +214,11 @@ namespace WomConnector.Tester {
             await pocket.CollectVouchers(response.OtcGen, response.Password);
 
             var paymentAckUrl = await pocket.PayWithRandomVouchers(request.OtcPay, request.Password);
-            Assert.AreEqual("https://example.org", paymentAckUrl);
+            Assert.That(paymentAckUrl, Is.EqualTo("https://example.org"));
 
             info = await pos.GetPaymentStatus(request.OtcPay);
-            Assert.AreEqual(pos.Identifier, info.PosId);
-            Assert.GreaterOrEqual(1, info.Response.Confirmations.Count);
+            Assert.That(info.PosId, Is.EqualTo(pos.Identifier));
+            Assert.That(info.Response.Confirmations.Count, Is.GreaterThanOrEqualTo(1));
         }
 
     }

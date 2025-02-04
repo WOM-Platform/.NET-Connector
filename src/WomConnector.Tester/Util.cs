@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Org.BouncyCastle.Crypto;
 using WomPlatform.Connector;

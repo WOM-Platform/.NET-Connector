@@ -30,7 +30,7 @@ namespace WomConnector.Tester {
                 }
             );
 
-            Assert.AreEqual(10, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(10));
 
             var pos = Util.GeneratePos();
             var responsePay = await pos.RequestPayment(
@@ -46,8 +46,8 @@ namespace WomConnector.Tester {
             );
 
             string ackUrl = await pocket.PayWithRandomVouchers(responsePay.OtcPay, responsePay.Password);
-            Assert.AreEqual(0, pocket.VoucherCount);
-            Assert.AreEqual("https://example.org", ackUrl);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(0));
+            Assert.That(ackUrl, Is.EqualTo("https://example.org"));
         }
 
     }

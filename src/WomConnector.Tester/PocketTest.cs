@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using WomPlatform.Connector;
 using WomPlatform.Connector.Models;
 
 namespace WomConnector.Tester {
@@ -27,7 +24,7 @@ namespace WomConnector.Tester {
 
             await pocket.CollectVouchers(response.OtcGen, response.Password);
 
-            Assert.AreEqual(10, pocket.VoucherCount);
+            Assert.That(pocket.VoucherCount, Is.EqualTo(10));
         }
 
     }
